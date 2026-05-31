@@ -1131,6 +1131,12 @@ export default function AdminDashboard() {
       alert('Mot de passe incorrect !');
     }
   };
+  
+  const handleAdminLogout = () => {
+    localStorage.removeItem('adminAuthenticated');
+    setIsAuthenticated(false);
+    window.location.reload();
+  };
 
   if (isLoading) {
     return (
@@ -1227,6 +1233,7 @@ export default function AdminDashboard() {
                </button>
              </div>
              <Link href="/" className="cyber-button">Retour au site</Link>
+             <button onClick={handleAdminLogout} className="cyber-button" style={{ borderColor: '#ff4444' }}>Se déconnecter</button>
            </div>
          </div>
        </header>
