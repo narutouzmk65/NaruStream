@@ -131,8 +131,9 @@ const genres = [
 ];
 
 export default function Home() {
-  const [movies, setMovies] = useState(DEFAULT_MOVIES);
+  const [movies, setMovies] = useState([]);
   const [sagas, setSagas] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [user, setUser] = useState(null);
@@ -196,15 +197,15 @@ export default function Home() {
           .order('created_at', { ascending: false });
 
         if (error) {
-          console.warn('⚠️ Erreur Supabase, on garde les films de test :', error);
+          console.warn('⚠️ Erreur Supabase :', error);
         } else if (data && data.length > 0) {
           console.log("✅ Films récupérés depuis Supabase !", data.length, "films");
           setMovies(data);
-        } else {
-          console.log("ℹ️ Aucun film dans Supabase, on garde les films de test.");
         }
       } catch (e) {
-        console.warn("⚠️ Erreur générale, on garde les films de test :", e);
+        console.warn("⚠️ Erreur générale :", e);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -338,6 +339,19 @@ export default function Home() {
       ? movies.filter(movie => movie.title.toLowerCase().includes(searchQuery.toLowerCase()))
       : movies
   );
+
+  if (loading) {
+    return (
+      <main className={styles.container} style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        minHeight: '100vh' 
+      }}>
+        <h1 style={{ color: 'white', fontSize: '1.5rem' }}>Chargement...</h1>
+      </main>
+    );
+  }
 
   return (
     <main className={styles.container}>
