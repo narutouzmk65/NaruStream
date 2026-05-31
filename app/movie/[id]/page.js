@@ -35,6 +35,7 @@ export default function MovieDetail() {
   const [selectedProfile, setSelectedProfile] = useState(null);
   const watchTimerRef = useRef(null);
   const historyLoggedRef = useRef(false);
+  const trailerSectionRef = useRef(null);
 
   // Helper function to convert age rating string to number
   const getAgeRatingNumber = (ageRating) => {
@@ -117,6 +118,13 @@ export default function MovieDetail() {
       }
     };
   }, [activeStream, movie]);
+  
+  // Auto-scroll to trailer when it's shown
+  useEffect(() => {
+    if (showMovieTrailer && trailerSectionRef.current) {
+      trailerSectionRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [showMovieTrailer]);
 
   // Function to try next stream
   const tryNextStream = async () => {
@@ -313,7 +321,7 @@ export default function MovieDetail() {
       <Link href="/" className={styles.backLink}>← Retour à l'accueil</Link>
 
       {trailerEmbedUrl && showMovieTrailer && (
-        <div className={styles.trailerSection}>
+        <div ref={trailerSectionRef} className={styles.trailerSection}>
           <iframe
             src={trailerEmbedUrl}
             className={styles.trailerPlayer}
