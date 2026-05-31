@@ -108,7 +108,9 @@ export default function ProfilesPage() {
       setPinProfile(profile);
       setShowPinModal(true);
     } else {
-      sessionStorage.setItem("current_profile", JSON.stringify(profile));
+      const profileJson = JSON.stringify(profile);
+      sessionStorage.setItem("current_profile", profileJson);
+      localStorage.setItem("current_profile", profileJson);
       setTimeout(() => {
         router.push("/");
       }, 500);
@@ -137,7 +139,9 @@ export default function ProfilesPage() {
               } catch (e) {
                 console.log("Audio error:", e);
               }
-              sessionStorage.setItem("current_profile", JSON.stringify(pinProfile));
+              const profileJson = JSON.stringify(pinProfile);
+              sessionStorage.setItem("current_profile", profileJson);
+              localStorage.setItem("current_profile", profileJson);
               setShowPinModal(false);
               setPinInput("");
               setTimeout(() => {
