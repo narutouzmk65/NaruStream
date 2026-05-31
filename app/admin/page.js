@@ -1577,7 +1577,12 @@ export default function AdminDashboard() {
               </div>
               <div className={styles.formGroup}>
                 <label>Catégorie</label>
-                <input type="text" className={styles.cyberInput} value={newSeriesCategory} onChange={(e) => setNewSeriesCategory(e.target.value)} placeholder="Action, Anime" />
+                <select className={styles.cyberInput} value={newSeriesCategory} onChange={(e) => setNewSeriesCategory(e.target.value)}>
+                  <option value="">Sélectionner une catégorie</option>
+                  {GENRES.map(genre => (
+                    <option key={genre} value={genre}>{genre}</option>
+                  ))}
+                </select>
               </div>
               <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem'}}>
                 <div className={styles.formGroup}>

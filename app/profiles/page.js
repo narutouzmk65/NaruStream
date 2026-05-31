@@ -29,6 +29,7 @@ export default function ProfilesPage() {
   const [isKid, setIsKid] = useState(false);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [showPinModal, setShowPinModal] = useState(false);
   const [pinProfile, setPinProfile] = useState(null);
   const [pinInput, setPinInput] = useState("");
@@ -53,6 +54,14 @@ export default function ProfilesPage() {
       }
       setUser(user);
       fetchProfiles(user.id);
+
+      // Check if user is admin
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("is_admin")
+        .eq("id", user.id)
+        .single();
+      setIsAdmin(profile?.is_admin || false);
     };
     checkUser();
   }, [router]);
@@ -245,9 +254,38 @@ export default function ProfilesPage() {
             <p className={styles.profileName}>Ajouter un profil</p>
           </div>
         </div>
-        <button onClick={handleLogout} className={styles.logoutButton}>
-          Se déconnecter
-        </button>
+        <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+          {isAdmin && (
+            <button 
+              onClick={() => router.push("/admin")} 
+              style={{
+                padding: '0.75rem 1.5rem',
+                fontSize: '1rem',
+                fontWeight: 'bold',
+                color: 'white',
+                background: 'linear-gradient(135deg, #00b4d8, #0077b6)',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                boxShadow: '0 0 20px rgba(0, 180, 216, 0.4)',
+                transition: 'transform 0.2s, box-shadow 0.2s'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = 'scale(1.05)';
+                e.target.style.boxShadow = '0 0 30px rgba(0, 180, 216, 0.6)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'scale(1)';
+                e.target.style.boxShadow = '0 0 20px rgba(0, 180, 216, 0.4)';
+              }}
+            >
+              🔧 Admin Dashboard
+            </button>
+          )}
+          <button onClick={handleLogout} className={styles.logoutButton}>
+            Se déconnecter
+          </button>
+        </div>
       </div>
 
       {showAddProfile && (
