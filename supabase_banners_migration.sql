@@ -30,14 +30,18 @@ CREATE OR REPLACE TRIGGER update_banners_updated_at
 -- Activer RLS (optionnel, mais sécurisé)
 ALTER TABLE public.banners ENABLE ROW LEVEL SECURITY;
 
+-- Supprimer les politiques existantes si elles existent (pour éviter les erreurs)
+DROP POLICY IF EXISTS "Allow public read access to active banners" ON public.banners;
+DROP POLICY IF EXISTS "Allow admin all access to banners" ON public.banners;
+
 -- Permettre à tout le monde de lire les bannières actives
-CREATE POLICY IF NOT EXISTS "Allow public read access to active banners"
+CREATE POLICY "Allow public read access to active banners"
     ON public.banners
     FOR SELECT
     USING (is_active = true);
 
 -- Permettre aux admins de gérer les bannières (via le dashboard)
-CREATE POLICY IF NOT EXISTS "Allow admin all access to banners"
+CREATE POLICY "Allow admin all access to banners"
     ON public.banners
     FOR ALL
     USING (true);
