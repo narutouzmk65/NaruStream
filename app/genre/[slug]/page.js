@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 import styles from "../../page.module.css";
 import { supabase } from "@/lib/supabase";
 
@@ -21,8 +22,9 @@ const genres = [
   { slug: "sciencefiction", name: "Science-Fiction" },
 ];
 
-export default function GenrePage({ params }) {
+export default function GenrePage() {
   try {
+    const params = useParams();
     const { slug } = params;
     // Normalize slug (lowercase, trim)
     const normalizedSlug = slug.toLowerCase().trim();
