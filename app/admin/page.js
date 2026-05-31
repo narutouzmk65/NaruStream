@@ -25,7 +25,7 @@ const GENRES = [
   "Science-Fiction"
 ];
 
-// Fonction pour vider le cache SANS toucher les données importantes
+// Fonction pour vider seulement le cache navigateur (pas localStorage/sessionStorage)
 const clearBrowserCache = () => {
   if ('caches' in window) {
     caches.keys().then(names => {
@@ -34,32 +34,11 @@ const clearBrowserCache = () => {
       }
     });
   }
-  
-  // Garde les clés importantes : profile selectionné, auth admin, maintenance mode, version du site
-  const keysToKeep = ['current_profile', 'adminAuthenticated', 'maintenance_mode', 'lastCacheClear', 'siteVersion'];
-  const tempStorage = {};
-  
-  // Sauvegarder les valeurs importantes
-  keysToKeep.forEach(key => {
-    const value = localStorage.getItem(key);
-    if (value) tempStorage[key] = value;
-  });
-  
-  // Effacer localStorage puis remettre les valeurs importantes
-  localStorage.clear();
-  Object.keys(tempStorage).forEach(key => {
-    localStorage.setItem(key, tempStorage[key]);
-  });
-  
-  // Ne pas toucher sessionStorage (où le profile est aussi stocké souvent)
-  // sessionStorage.clear(); // Commenté pour préserver le profil
 };
 
-// Vider le cache à chaque ouverture du site
+// Vider le cache navigateur à chaque ouverture du site
 const checkAndClearCache = () => {
   clearBrowserCache();
-  const now = new Date().getTime();
-  localStorage.setItem('lastCacheClear', now.toString());
 };
 
 export default function AdminDashboard() {

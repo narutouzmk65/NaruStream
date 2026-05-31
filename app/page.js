@@ -1,12 +1,12 @@
 "use client";
 import Link from "next/link";
-import { useState, useEffect, Suspense, useRef } from "react";
+import { useState, useEffect, Suspense, useRef, useCallback } from "react";
 import styles from "./page.module.css";
 import { supabase } from "@/lib/supabase";
 import SearchBar from "@/components/SearchBar";
 import HeroCarousel from "@/components/HeroCarousel";
 
-// Fonction pour vider le cache SANS toucher les données importantes
+// Fonction pour vider seulement le cache navigateur (pas localStorage/sessionStorage)
 const clearBrowserCache = () => {
   if ('caches' in window) {
     caches.keys().then(names => {
@@ -15,105 +15,12 @@ const clearBrowserCache = () => {
       }
     });
   }
-  
-  // Garde les clés importantes : profile selectionné, auth admin, maintenance mode, version du site
-  const keysToKeep = ['current_profile', 'adminAuthenticated', 'maintenance_mode', 'lastCacheClear', 'siteVersion'];
-  const tempStorage = {};
-  
-  // Sauvegarder les valeurs importantes
-  keysToKeep.forEach(key => {
-    const value = localStorage.getItem(key);
-    if (value) tempStorage[key] = value;
-  });
-  
-  // Effacer localStorage puis remettre les valeurs importantes
-  localStorage.clear();
-  Object.keys(tempStorage).forEach(key => {
-    localStorage.setItem(key, tempStorage[key]);
-  });
-  
-  // Ne pas toucher sessionStorage (où le profile est aussi stocké souvent)
-  // sessionStorage.clear(); // Commenté pour préserver le profil
 };
 
-// Vider le cache à chaque ouverture du site
+// Vider le cache navigateur à chaque ouverture du site
 const checkAndClearCache = () => {
   clearBrowserCache();
-  const now = new Date().getTime();
-  localStorage.setItem('lastCacheClear', now.toString());
 };
-
-
-
-// Films de test par défaut (toujours affichés)
-const DEFAULT_MOVIES = [
-  {
-    id: "1",
-    title: "Le Roi Lion",
-    description: "Un lion prince doit reconquérir son trône",
-    poster_url: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=600&fit=crop",
-    backdrop_url: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=1200&h=600&fit=crop",
-    category: "Animation, Famille",
-    content_type: "film",
-    age_rating: "Tous publics",
-    platform: "Disney+",
-    status: "sortie",
-    created_at: new Date().toISOString()
-  },
-  {
-    id: "2",
-    title: "John Wick",
-    description: "Un ex-assassin à la retraite reprend du service",
-    poster_url: "https://images.unsplash.com/photo-1534809027769-b00d750a6bac?w=400&h=600&fit=crop",
-    backdrop_url: "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=1200&h=600&fit=crop",
-    category: "Action, Thriller",
-    content_type: "film",
-    age_rating: "16+",
-    platform: "Netflix",
-    status: "sortie",
-    created_at: new Date().toISOString()
-  },
-  {
-    id: "3",
-    title: "Stranger Things",
-    description: "Un groupe d'amis découvre des expériences secrètes",
-    poster_url: "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=400&h=600&fit=crop",
-    backdrop_url: "https://images.unsplash.com/photo-1489599849980-8191a6c5131e?w=1200&h=600&fit=crop",
-    category: "Science-Fiction, Horreur",
-    content_type: "serie",
-    age_rating: "12+",
-    platform: "Netflix",
-    status: "sortie",
-    created_at: new Date().toISOString()
-  },
-  {
-    id: "4",
-    title: "Interstellar",
-    description: "Un voyage à travers l'espace pour sauver l'humanité",
-    poster_url: "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=400&h=600&fit=crop",
-    backdrop_url: "https://images.unsplash.com/photo-1489599849980-8191a6c5131e?w=1200&h=600&fit=crop",
-    category: "Science-Fiction, Drame",
-    content_type: "film",
-    age_rating: "12+",
-    platform: "Max",
-    status: "sortie",
-    created_at: new Date().toISOString()
-  },
-  {
-    id: "5",
-    title: "La La Land",
-    description: "Un pianiste et une actrice tombent amoureux à Los Angeles",
-    poster_url: "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=400&h=600&fit=crop",
-    backdrop_url: "https://images.unsplash.com/photo-1478720568477-152d9b164e63?w=1200&h=600&fit=crop",
-    category: "Comédie, Romance, Musical",
-    content_type: "film",
-    age_rating: "Tous publics",
-    platform: "Prime Video",
-    status: "sortie",
-    created_at: new Date().toISOString()
-  }
-];
-
 const genres = [
   { slug: "animation", name: "Animation" },
   { slug: "action", name: "Action" },
@@ -153,6 +60,17 @@ export default function Home() {
     const scrollAmount = 600;
     carousel.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
   };
+
+  // Precompute match percentages when movies are loaded
+  useEffect(() => {
+    if (movies.length > 0) {
+      const newPercentages = {};
+      movies.forEach(movie => {
+        newPercentages[movie.id] = Math.floor(Math.random() * 21) + 80;
+      });
+      setPercentages(newPercentages);
+    }
+  }, [movies]);
 
   useEffect(() => {
     // Vider le cache si nécessaire
@@ -294,14 +212,11 @@ export default function Home() {
 
   const getRandomPercentage = (movieId) => {
     if (!isClient) return 90; // Valeur par défaut pour le serveur
-    if (percentages[movieId]) return percentages[movieId];
-    const value = Math.floor(Math.random() * 21) + 80;
-    setPercentages(prev => ({ ...prev, [movieId]: value }));
-    return value;
+    return percentages[movieId] || 90;
   };
 
   // Générer le greeting seulement après le mount (pour éviter hydration error)
-  const generateGreeting = () => {
+  const generateGreeting = useCallback(() => {
     const hour = new Date().getHours();
     const name = selectedProfile?.name || "ninja";
     const greetings = {
@@ -332,7 +247,7 @@ export default function Home() {
 
     const options = greetings[timeOfDay];
     return options[Math.floor(Math.random() * options.length)];
-  };
+  }, [selectedProfile]);
 
   const filteredMovies = filterMoviesByAge(
     searchQuery
@@ -524,7 +439,7 @@ export default function Home() {
             ) : (
               <div className={styles.desktopOnly}>
                 <Link href="/login" className={styles.navLink}>Se connecter</Link>
-                <Link href="/login" className={`${styles.navLink} ${styles.requestButton}`}>S'inscrire</Link>
+                <Link href="/login" className={`${styles.navLink} ${styles.requestButton}`}>S&apos;inscrire</Link>
               </div>
             )}
           </div>

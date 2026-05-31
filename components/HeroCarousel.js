@@ -1,27 +1,31 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
 import styles from "./HeroCarousel.module.css";
 import { supabase } from "@/lib/supabase";
 
 export default function HeroCarousel({ movies }) {
-  const [banners, setBanners] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-
-  // Charger les bannières OU fallback sur les films (RAPIDE !)
-  useEffect(() => {
-    // D'abord, on prépare les films en fallback pour que ça soit instantané
-    const fallbackBanners = movies.map(movie => ({
+  // Use useMemo for fallback banners (no state needed for fallback)
+  const fallbackBanners = useMemo(() => {
+    return movies.map(movie => ({
       id: movie.id,
       title: movie.title,
       description: movie.description,
       image_url: movie.backdrop_url || movie.poster_url,
       link_url: `/movie/${movie.id}`
     }));
-    
-    // Puis on essaie de charger les vraies bannières depuis la BDD
+  }, [movies]);
+
+  const [dbBanners, setDbBanners] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
+  // Determine which banners to use
+  const banners = dbBanners && dbBanners.length > 0 ? dbBanners : fallbackBanners;
+
+  // Charger les bannières depuis la BDD
+  useEffect(() => {
     const fetchBanners = async () => {
       try {
         const { data, error } = await supabase
@@ -31,16 +35,15 @@ export default function HeroCarousel({ movies }) {
           .order("display_order", { ascending: true });
           
         if (!error && data && data.length > 0) {
-          setBanners(data);
+          setDbBanners(data);
         }
       } catch (e) {
         console.error("Erreur chargement bannières:", e);
       }
     };
     
-    setBanners(fallbackBanners); // Affiche qqchose IMMÉDIATEMENT
     fetchBanners();
-  }, [movies]);
+  }, []);
 
   const nextSlide = useCallback(() => {
     if (isTransitioning || banners.length === 0) return;

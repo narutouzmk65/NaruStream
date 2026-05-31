@@ -152,35 +152,17 @@ export default function RootLayout({ children }) {
   return (
     <html lang="fr" className={`${inter.variable} ${orbitron.variable}`}>
       <head>
-        <link rel="icon" href="/favicon.svg?v=20260531" />
+        <link rel="icon" href="/favicon.svg" />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="theme-color" content="#0a0a0a" />
         {/* Pas de cache ! Force le navigateur à toujours charger la version la plus récente */}
-        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0, s-maxage=0, stale-while-revalidate=0" />
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0" />
         <meta http-equiv="Pragma" content="no-cache" />
         <meta http-equiv="Expires" content="0" />
-        <meta name="version" content="2026.05.31.1" />
         {/* Additional anti-popup security */}
         <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https:; frame-src *; img-src * data: blob:; media-src * data: blob:;" />
-        <script dangerouslySetInnerHTML={{
-          __html: `
-            // Forcer le rechargement complet si l'ancienne version est en cache
-            const currentVersion = "2026.05.31.1";
-            const storedVersion = localStorage.getItem("siteVersion");
-            
-            if (storedVersion !== currentVersion) {
-              localStorage.setItem("siteVersion", currentVersion);
-              // Vider le cache complet avant rechargement
-              if ('caches' in window) {
-                caches.keys().then(names => names.forEach(name => caches.delete(name)));
-              }
-              // Recharger la page complètement
-              window.location.reload(true);
-            }
-          `
-        }} />
       </head>
       <body>
         <MobileBackHandler />
