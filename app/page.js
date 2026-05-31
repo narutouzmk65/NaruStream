@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase";
 import SearchBar from "@/components/SearchBar";
 import HeroCarousel from "@/components/HeroCarousel";
 
-// Fonction pour vider le cache
+// Fonction pour vider le cache SANS toucher les données importantes
 const clearBrowserCache = () => {
   if ('caches' in window) {
     caches.keys().then(names => {
@@ -15,8 +15,25 @@ const clearBrowserCache = () => {
       }
     });
   }
+  
+  // Garde les clés importantes : profile selectionné, auth admin, maintenance mode
+  const keysToKeep = ['current_profile', 'adminAuthenticated', 'maintenance_mode', 'lastCacheClear'];
+  const tempStorage = {};
+  
+  // Sauvegarder les valeurs importantes
+  keysToKeep.forEach(key => {
+    const value = localStorage.getItem(key);
+    if (value) tempStorage[key] = value;
+  });
+  
+  // Effacer localStorage puis remettre les valeurs importantes
   localStorage.clear();
-  sessionStorage.clear();
+  Object.keys(tempStorage).forEach(key => {
+    localStorage.setItem(key, tempStorage[key]);
+  });
+  
+  // Ne pas toucher sessionStorage (où le profile est aussi stocké souvent)
+  // sessionStorage.clear(); // Commenté pour préserver le profil
 };
 
 // Vider le cache à chaque ouverture du site
