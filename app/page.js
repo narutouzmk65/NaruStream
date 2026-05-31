@@ -244,19 +244,6 @@ export default function Home() {
 
   return (
     <main className={styles.container}>
-      {/* BLOC DEBUG : Affiche les données brutes pour vérifier */}
-      <div style={{
-        background: 'rgba(255,0,0,0.1)',
-        border: '2px solid red',
-        padding: '1rem',
-        margin: '1rem 0',
-        color: 'white'
-      }}>
-        <h2>🔍 DEBUG</h2>
-        <p>Nombre de films : <strong>{movies.length}</strong></p>
-        <pre>{JSON.stringify(movies, null, 2)}</pre>
-      </div>
-      
       <header className={styles.header}>
         <h1 className={`${styles.logo} text-glow-primary`}>
           NARU<span>.STREAM</span>
