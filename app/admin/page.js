@@ -8,6 +8,23 @@ import { supabase } from '@/lib/supabase';
 
 const ADMIN_PASSWORD = "8922513A4C38ADA3DD4703613838DAD1D7D2D4A2DB243F40240EC80F21543D4A";
 
+// Liste des genres disponibles
+const GENRES = [
+  "Animation",
+  "Action",
+  "Aventure",
+  "Fantasy",
+  "Horreur",
+  "Romance",
+  "Thriller",
+  "Famille",
+  "Historique",
+  "Musical",
+  "Comédie",
+  "Drame",
+  "Science-Fiction"
+];
+
 // Fonction pour vider le cache
 const clearBrowserCache = () => {
   if ('caches' in window) {
@@ -51,6 +68,8 @@ export default function AdminDashboard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [contactMessages, setContactMessages] = useState([]);
   const [downloads, setDownloads] = useState([]);
+  const [banners, setBanners] = useState([]);
+  const [editingBanner, setEditingBanner] = useState(null);
 
   // Comprehensive Form State
   const [contentType, setContentType] = useState('film');
@@ -158,7 +177,8 @@ export default function AdminDashboard() {
         fetchSeries(),
         fetchMaintenanceMode(),
         fetchContactMessages(),
-        fetchDownloads()
+        fetchDownloads(),
+        fetchBanners()
       ]);
     };
     init();
@@ -315,6 +335,65 @@ export default function AdminDashboard() {
     const { data, error } = await supabase.from('downloads').select('*, profiles(*)').order('downloaded_at', { ascending: false });
     if (!error && data) {
       setDownloads(data);
+    }
+  };
+  
+  const fetchBanners = async () => {
+    const { data, error } = await supabase.from('banners').select('*').order('display_order', { ascending: true });
+    if (!error && data) {
+      setBanners(data);
+    }
+  };
+  
+  const handleSaveBanner = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      if (editingBanner) {
+        const { error } = await supabase.from('banners').update({
+          title: editingBanner.title,
+          description: editingBanner.description,
+          image_url: editingBanner.image_url,
+          link_url: editingBanner.link_url,
+          display_order: editingBanner.display_order || 0,
+          is_active: editingBanner.is_active !== false,
+          updated_at: new Date().toISOString()
+        }).eq('id', editingBanner.id);
+        if (!error) {
+          alert('Bannière modifiée avec succès !');
+          setEditingBanner(null);
+          fetchBanners();
+        }
+      } else {
+        const { error } = await supabase.from('banners').insert({
+          title: editingBanner?.title || '',
+          description: editingBanner?.description,
+          image_url: editingBanner?.image_url,
+          link_url: editingBanner?.link_url,
+          display_order: editingBanner?.display_order || 0,
+          is_active: editingBanner?.is_active !== false
+        });
+        if (!error) {
+          alert('Bannière ajoutée avec succès !');
+          setEditingBanner(null);
+          fetchBanners();
+        }
+      }
+    } catch (e) {
+      alert('Erreur lors de la sauvegarde de la bannière !');
+      console.error(e);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  
+  const handleDeleteBanner = async (bannerId) => {
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer cette bannière ?')) {
+      const { error } = await supabase.from('banners').delete().eq('id', bannerId);
+      if (!error) {
+        fetchBanners();
+        alert('Bannière supprimée avec succès !');
+      }
     }
   };
 
@@ -1222,6 +1301,13 @@ export default function AdminDashboard() {
         >
           Téléchargements
         </button>
+        <button
+          onClick={() => setActiveTab('banners')}
+          className={`cyber-button ${activeTab === 'banners' ? 'primary' : ''}`}
+          style={{ padding: '10px 20px' }}
+        >
+          Bannières
+        </button>
       </div>
 
       {/* Contenus Tab */}
@@ -1311,7 +1397,12 @@ export default function AdminDashboard() {
                   </div>
                   <div className={styles.formGroup}>
                     <label>Catégorie</label>
-                    <input type="text" className={styles.cyberInput} value={category} onChange={(e) => setCategory(e.target.value)} placeholder="Ex: Action, Sci-Fi" />
+                    <select className={styles.cyberInput} value={category} onChange={(e) => setCategory(e.target.value)}>
+                      <option value="">Sélectionner une catégorie</option>
+                      {GENRES.map(genre => (
+                        <option key={genre} value={genre}>{genre}</option>
+                      ))}
+                    </select>
                   </div>
                   <div className={styles.formGroup}>
                     <label>Classification d'âge</label>
@@ -2259,6 +2350,175 @@ export default function AdminDashboard() {
         </div>
       </div>
     )}
+    
+    {/* Banners Tab */}
+    {activeTab === 'banners' && (
+      <div className={styles.panel}>
+        <h2 className="text-glow-yellow">🎨 Gestion des Bannières</h2>
+        
+        {/* Add/Edit Banner Form */}
+        <div className={styles.panel} style={{ marginTop: '1rem', marginBottom: '2rem', background: 'rgba(0,0,0,0.2)' }}>
+          <h3 className="text-glow-blue" style={{ marginBottom: '1rem' }}>{editingBanner ? 'Modifier la Bannière' : 'Ajouter une Bannière'}</h3>
+          <form className={styles.adminForm} onSubmit={handleSaveBanner}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div className={styles.formGroup}>
+                <label>Titre *</label>
+                <input 
+                  type="text" 
+                  className={styles.cyberInput} 
+                  value={editingBanner?.title || ''} 
+                  onChange={(e) => setEditingBanner(prev => ({ ...(prev || {}), title: e.target.value }))} 
+                  placeholder="Titre de la bannière..." 
+                  required 
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Ordre d'affichage</label>
+                <input 
+                  type="number" 
+                  className={styles.cyberInput} 
+                  value={editingBanner?.display_order || 0} 
+                  onChange={(e) => setEditingBanner(prev => ({ ...(prev || {}), display_order: parseInt(e.target.value) || 0 }))} 
+                  placeholder="0" 
+                />
+              </div>
+            </div>
+            
+            <div className={styles.formGroup}>
+              <label>Description</label>
+              <textarea 
+                className={styles.cyberInput} 
+                rows="3" 
+                value={editingBanner?.description || ''} 
+                onChange={(e) => setEditingBanner(prev => ({ ...(prev || {}), description: e.target.value }))} 
+                placeholder="Description courte..."
+              ></textarea>
+            </div>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div className={styles.formGroup}>
+                <label>URL de l'image *</label>
+                <input 
+                  type="text" 
+                  className={styles.cyberInput} 
+                  value={editingBanner?.image_url || ''} 
+                  onChange={(e) => setEditingBanner(prev => ({ ...(prev || {}), image_url: e.target.value }))} 
+                  placeholder="https://example.com/image.jpg" 
+                  required 
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label>URL du lien (optionnel)</label>
+                <input 
+                  type="text" 
+                  className={styles.cyberInput} 
+                  value={editingBanner?.link_url || ''} 
+                  onChange={(e) => setEditingBanner(prev => ({ ...(prev || {}), link_url: e.target.value }))} 
+                  placeholder="/movie/123 ou https://..."
+                />
+              </div>
+            </div>
+            
+            <div className={styles.formGroup} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <label style={{ margin: 0 }}>Actif</label>
+              <input 
+                type="checkbox" 
+                checked={editingBanner?.is_active !== false} 
+                onChange={(e) => setEditingBanner(prev => ({ ...(prev || {}), is_active: e.target.checked }))} 
+                style={{ width: 'auto', transform: 'scale(1.5)', cursor: 'pointer' }}
+              />
+            </div>
+            
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+              <button type="submit" className="cyber-button primary" disabled={isSubmitting}>
+                {editingBanner ? 'Sauvegarder' : 'Ajouter'}
+              </button>
+              {editingBanner && (
+                <button 
+                  type="button" 
+                  className="cyber-button" 
+                  onClick={() => setEditingBanner(null)}
+                >
+                  Annuler
+                </button>
+              )}
+            </div>
+          </form>
+        </div>
+        
+        {/* Banner List */}
+        <h3 className="text-glow-green" style={{ marginBottom: '1rem' }}>Liste des Bannières</h3>
+        {banners.length === 0 ? (
+          <p style={{ color: '#aaa' }}>Aucune bannière pour le moment.</p>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem' }}>
+            {banners.map(banner => (
+              <div 
+                key={banner.id} 
+                style={{ 
+                  background: 'rgba(255,255,255,0.05)', 
+                  padding: '1rem', 
+                  borderRadius: '8px', 
+                  border: `1px solid ${banner.is_active ? 'var(--neon-blue)' : '#444'}` 
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+                  <h4 style={{ color: 'white', margin: 0, fontSize: '1rem' }}>{banner.title}</h4>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button 
+                      onClick={() => setEditingBanner(banner)} 
+                      className="cyber-button" 
+                      style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem' }}
+                    >
+                      ✏️ Modifier
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteBanner(banner.id)} 
+                      className="cyber-button" 
+                      style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem', borderColor: '#ff4444' }}
+                    >
+                      🗑️ Supprimer
+                    </button>
+                  </div>
+                </div>
+                <p style={{ color: '#aaa', fontSize: '0.8rem', marginBottom: '0.5rem' }}>
+                  {banner.description}
+                </p>
+                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>
+                  <span style={{ 
+                    padding: '0.2rem 0.5rem', 
+                    borderRadius: '4px', 
+                    fontSize: '0.7rem', 
+                    background: banner.is_active ? 'rgba(0,255,100,0.2)' : 'rgba(255,0,0,0.2)', 
+                    border: `1px solid ${banner.is_active ? '#00ff64' : '#ff4444'}`, 
+                    color: banner.is_active ? '#00ff64' : '#ff4444' 
+                  }}>
+                    {banner.is_active ? 'ACTIF' : 'INACTIF'}
+                  </span>
+                  <span style={{ 
+                    padding: '0.2rem 0.5rem', 
+                    borderRadius: '4px', 
+                    fontSize: '0.7rem', 
+                    background: 'rgba(0,0,0,0.3)', 
+                    border: '1px solid #444', 
+                    color: '#aaa' 
+                  }}>
+                    Ordre: {banner.display_order}
+                  </span>
+                </div>
+                {banner.image_url && (
+                  <img 
+                    src={banner.image_url} 
+                    alt={banner.title} 
+                    style={{ width: '100%', borderRadius: '4px', marginTop: '0.5rem', maxHeight: '150px', objectFit: 'cover' }} 
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    )}
 
     {/* Edit Modal */}
       {editingMovie && (
@@ -2301,7 +2561,12 @@ export default function AdminDashboard() {
                 </div>
                 <div className={styles.formGroup}>
                   <label>Catégorie</label>
-                  <input type="text" className={styles.cyberInput} value={editingMovie.category || ''} onChange={(e) => handleEditChange('category', e.target.value)} />
+                  <select className={styles.cyberInput} value={editingMovie.category || ''} onChange={(e) => handleEditChange('category', e.target.value)}>
+                    <option value="">Sélectionner une catégorie</option>
+                    {GENRES.map(genre => (
+                      <option key={genre} value={genre}>{genre}</option>
+                    ))}
+                  </select>
                 </div>
                 <div className={styles.formGroup}>
                   <label>Classification d'âge</label>
