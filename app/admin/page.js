@@ -35,8 +35,8 @@ const clearBrowserCache = () => {
     });
   }
   
-  // Garde les clés importantes : profile selectionné, auth admin, maintenance mode
-  const keysToKeep = ['current_profile', 'adminAuthenticated', 'maintenance_mode', 'lastCacheClear'];
+  // Garde les clés importantes : profile selectionné, auth admin, maintenance mode, version du site
+  const keysToKeep = ['current_profile', 'adminAuthenticated', 'maintenance_mode', 'lastCacheClear', 'siteVersion'];
   const tempStorage = {};
   
   // Sauvegarder les valeurs importantes
