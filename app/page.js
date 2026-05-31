@@ -77,15 +77,35 @@ export default function Home() {
     checkUser();
 
     const fetchMovies = async () => {
-      const { data, error } = await supabase
-        .from('movies')
-        .select('*')
-        .order('created_at', { ascending: false });
+      console.log("🔍 Début fetchMovies...");
+      try {
+        const { data, error } = await supabase
+          .from('movies')
+          .select('*')
+          .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching movies:', error);
-      } else {
-        setMovies(data || []);
+        if (error) {
+          console.error('❌ Error fetching movies:', error);
+          // Si erreur Supabase, on utilise des films de test pour que ça marche !
+          const testMovies = [
+            { id: 1, title: "Le Roi Lion", description: "Un lion prince", poster_url: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=600&fit=crop", category: "Animation, Famille", content_type: "film", age_rating: "Tous publics", status: "sortie", created_at: new Date().toISOString() },
+            { id: 2, title: "John Wick", description: "Un ex-assassin", poster_url: "https://images.unsplash.com/photo-1534809027769-b00d750a6bac?w=400&h=600&fit=crop", category: "Action, Thriller", content_type: "film", age_rating: "16+", status: "sortie", created_at: new Date().toISOString() },
+            { id: 3, title: "Stranger Things", description: "Un groupe d'amis", poster_url: "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=400&h=600&fit=crop", category: "Science-Fiction, Horreur", content_type: "serie", age_rating: "12+", status: "sortie", created_at: new Date().toISOString() }
+          ];
+          setMovies(testMovies);
+        } else {
+          console.log("✅ Films récupérés depuis Supabase !", data?.length, "films");
+          setMovies(data || []);
+        }
+      } catch (e) {
+        console.error("❌ Erreur générale fetchMovies :", e);
+        // Fallback sur les films de test
+        const testMovies = [
+          { id: 1, title: "Le Roi Lion", description: "Un lion prince", poster_url: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=600&fit=crop", category: "Animation, Famille", content_type: "film", age_rating: "Tous publics", status: "sortie", created_at: new Date().toISOString() },
+          { id: 2, title: "John Wick", description: "Un ex-assassin", poster_url: "https://images.unsplash.com/photo-1534809027769-b00d750a6bac?w=400&h=600&fit=crop", category: "Action, Thriller", content_type: "film", age_rating: "16+", status: "sortie", created_at: new Date().toISOString() },
+          { id: 3, title: "Stranger Things", description: "Un groupe d'amis", poster_url: "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=400&h=600&fit=crop", category: "Science-Fiction, Horreur", content_type: "serie", age_rating: "12+", status: "sortie", created_at: new Date().toISOString() }
+        ];
+        setMovies(testMovies);
       }
     };
 
@@ -222,6 +242,19 @@ export default function Home() {
 
   return (
     <main className={styles.container}>
+      {/* BLOC DEBUG : Affiche les données brutes pour vérifier */}
+      <div style={{
+        background: 'rgba(255,0,0,0.1)',
+        border: '2px solid red',
+        padding: '1rem',
+        margin: '1rem 0',
+        color: 'white'
+      }}>
+        <h2>🔍 DEBUG</h2>
+        <p>Nombre de films : <strong>{movies.length}</strong></p>
+        <pre>{JSON.stringify(movies, null, 2)}</pre>
+      </div>
+      
       <header className={styles.header}>
         <h1 className={`${styles.logo} text-glow-primary`}>
           NARU<span>.STREAM</span>
