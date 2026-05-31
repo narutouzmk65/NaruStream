@@ -76,8 +76,18 @@ export default function Home() {
     };
     checkUser();
 
+    // Films de test DEFAULT : ils s'affichent TOUJOURS si Supabase a un problème
+    const DEFAULT_MOVIES = [
+      { id: 1, title: "Le Roi Lion", description: "Un lion prince doit reconquérir son trône", poster_url: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=600&fit=crop", backdrop_url: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=1200&h=600&fit=crop", category: "Animation, Famille", content_type: "film", age_rating: "Tous publics", platform: "Disney+", status: "sortie", created_at: new Date().toISOString() },
+      { id: 2, title: "John Wick", description: "Un ex-assassin à la retraite reprend du service", poster_url: "https://images.unsplash.com/photo-1534809027769-b00d750a6bac?w=400&h=600&fit=crop", backdrop_url: "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=1200&h=600&fit=crop", category: "Action, Thriller", content_type: "film", age_rating: "16+", platform: "Netflix", status: "sortie", created_at: new Date().toISOString() },
+      { id: 3, title: "Stranger Things", description: "Un groupe d'amis découvre des expériences secrètes", poster_url: "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=400&h=600&fit=crop", backdrop_url: "https://images.unsplash.com/photo-1489599849980-8191a6c5131e?w=1200&h=600&fit=crop", category: "Science-Fiction, Horreur", content_type: "serie", age_rating: "12+", platform: "Netflix", status: "sortie", created_at: new Date().toISOString() }
+    ];
+
     const fetchMovies = async () => {
       console.log("🔍 Début fetchMovies...");
+      // D'abord, on initialise avec les films de test pour que ça marche immédiatement
+      setMovies(DEFAULT_MOVIES);
+      
       try {
         const { data, error } = await supabase
           .from('movies')
@@ -85,27 +95,15 @@ export default function Home() {
           .order('created_at', { ascending: false });
 
         if (error) {
-          console.error('❌ Error fetching movies:', error);
-          // Si erreur Supabase, on utilise des films de test pour que ça marche !
-          const testMovies = [
-            { id: 1, title: "Le Roi Lion", description: "Un lion prince", poster_url: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=600&fit=crop", category: "Animation, Famille", content_type: "film", age_rating: "Tous publics", status: "sortie", created_at: new Date().toISOString() },
-            { id: 2, title: "John Wick", description: "Un ex-assassin", poster_url: "https://images.unsplash.com/photo-1534809027769-b00d750a6bac?w=400&h=600&fit=crop", category: "Action, Thriller", content_type: "film", age_rating: "16+", status: "sortie", created_at: new Date().toISOString() },
-            { id: 3, title: "Stranger Things", description: "Un groupe d'amis", poster_url: "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=400&h=600&fit=crop", category: "Science-Fiction, Horreur", content_type: "serie", age_rating: "12+", status: "sortie", created_at: new Date().toISOString() }
-          ];
-          setMovies(testMovies);
+          console.error('❌ Error fetching movies (on garde les films de test) :', error);
+        } else if (data && data.length > 0) {
+          console.log("✅ Films récupérés depuis Supabase !", data.length, "films");
+          setMovies(data);
         } else {
-          console.log("✅ Films récupérés depuis Supabase !", data?.length, "films");
-          setMovies(data || []);
+          console.log("ℹ️ Aucun film dans Supabase, on garde les films de test.");
         }
       } catch (e) {
-        console.error("❌ Erreur générale fetchMovies :", e);
-        // Fallback sur les films de test
-        const testMovies = [
-          { id: 1, title: "Le Roi Lion", description: "Un lion prince", poster_url: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=600&fit=crop", category: "Animation, Famille", content_type: "film", age_rating: "Tous publics", status: "sortie", created_at: new Date().toISOString() },
-          { id: 2, title: "John Wick", description: "Un ex-assassin", poster_url: "https://images.unsplash.com/photo-1534809027769-b00d750a6bac?w=400&h=600&fit=crop", category: "Action, Thriller", content_type: "film", age_rating: "16+", status: "sortie", created_at: new Date().toISOString() },
-          { id: 3, title: "Stranger Things", description: "Un groupe d'amis", poster_url: "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=400&h=600&fit=crop", category: "Science-Fiction, Horreur", content_type: "serie", age_rating: "12+", status: "sortie", created_at: new Date().toISOString() }
-        ];
-        setMovies(testMovies);
+        console.error("❌ Erreur générale fetchMovies (on garde les films de test) :", e);
       }
     };
 
