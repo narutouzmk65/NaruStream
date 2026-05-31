@@ -827,6 +827,23 @@ export default function Home() {
           })}
         </>
       )}
+      {/* Mobile Bottom Navigation */}
+      <nav className={`${styles.mobileNav} ${styles.mobileOnly}`}>
+        <Link href="/" className={`${styles.mobileNavItem} ${styles.active}`}>
+          <span className={styles.mobileNavIcon}>🏠</span>
+          <span>Accueil</span>
+        </Link>
+        <Link href="/ma-liste" className={styles.mobileNavItem}>
+          <span className={styles.mobileNavIcon}>📋</span>
+          <span>Ma Liste</span>
+        </Link>
+        {user && (
+          <Link href="/profiles" className={styles.mobileNavItem}>
+            <span className={styles.mobileNavIcon}>🎭</span>
+            <span>Profils</span>
+          </Link>
+        )}
+      </nav>
     </main>
   );
 }

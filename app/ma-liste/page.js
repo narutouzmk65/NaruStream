@@ -3,12 +3,19 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
+import styles from '../page.module.css';
 
 export default function MaListe() {
   const [myList, setMyList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    checkUser();
     fetchMyList();
   }, []);
 
@@ -79,7 +86,8 @@ export default function MaListe() {
       minHeight: '100vh', 
       padding: '2rem', 
       maxWidth: '1400px', 
-      margin: '0 auto' 
+      margin: '0 auto',
+      paddingBottom: '5rem' // For mobile nav
     }}>
       <div style={{ marginBottom: '2rem' }}>
         <Link href="/" style={{ color: 'white', textDecoration: 'none' }}>
@@ -192,6 +200,24 @@ export default function MaListe() {
           ))}
         </div>
       )}
+
+      {/* Mobile Bottom Navigation */}
+      <nav className={`${styles.mobileNav} ${styles.mobileOnly}`}>
+        <Link href="/" className={styles.mobileNavItem}>
+          <span className={styles.mobileNavIcon}>🏠</span>
+          <span>Accueil</span>
+        </Link>
+        <Link href="/ma-liste" className={`${styles.mobileNavItem} ${styles.active}`}>
+          <span className={styles.mobileNavIcon}>📋</span>
+          <span>Ma Liste</span>
+        </Link>
+        {user && (
+          <Link href="/profiles" className={styles.mobileNavItem}>
+            <span className={styles.mobileNavIcon}>🎭</span>
+            <span>Profils</span>
+          </Link>
+        )}
+      </nav>
     </div>
   );
 }

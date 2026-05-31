@@ -635,8 +635,58 @@
   display: flex;
 }
 
-/* Mobile dropdown adjustments */
+/* Mobile only elements */
+.mobileOnly {
+  display: none !important;
+}
+
+/* Mobile bottom navigation */
+.mobileNav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(10, 10, 10, 0.98);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0.75rem 0;
+  z-index: 1000;
+  padding-bottom: env(safe-area-inset-bottom, 0.75rem);
+}
+
+.mobileNavItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.7rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0.25rem 0.75rem;
+}
+
+.mobileNavItem.active,
+.mobileNavItem:hover {
+  color: var(--primary-color);
+}
+
+.mobileNavIcon {
+  font-size: 1.5rem;
+}
+
+/* Adjust content to not be covered by bottom nav on mobile */
 @media (max-width: 768px) {
+  .mobileOnly {
+    display: flex !important;
+  }
+  
   .desktopOnly {
     display: none !important;
   }
@@ -646,5 +696,33 @@
     left: 50%;
     transform: translateX(-50%);
     top: auto;
+  }
+  
+  .container {
+    padding-bottom: 5rem;
+  }
+  
+  .searchResults {
+    padding-bottom: 5rem;
+  }
+  
+  .carouselContainer {
+    padding-bottom: 0;
+  }
+}
+
+/* Smaller bottom nav for tiny phones */
+@media (max-width: 360px) {
+  .mobileNav {
+    padding: 0.5rem 0;
+    padding-bottom: env(safe-area-inset-bottom, 0.5rem);
+  }
+  
+  .mobileNavIcon {
+    font-size: 1.3rem;
+  }
+  
+  .mobileNavItem {
+    font-size: 0.65rem;
   }
 }

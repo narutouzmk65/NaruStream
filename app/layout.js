@@ -34,12 +34,28 @@ const publicRoutes = ["/login", "/profiles", "/admin"];
 // Routes that don't require profile selection
 const noProfileRequiredRoutes = ["/login", "/profiles", "/admin"];
 
+// Fonction pour vider le cache navigateur (sans toucher localStorage/sessionStorage)
+const clearBrowserCache = () => {
+  if (typeof window !== 'undefined' && 'caches' in window) {
+    caches.keys().then(names => {
+      for (let name of names) {
+        caches.delete(name);
+      }
+    });
+  }
+};
+
 export default function RootLayout({ children }) {
   const [currentTitle, setCurrentTitle] = useState(titleOptions[0]);
   const [user, setUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+
+  // Vider le cache à chaque chargement de l'app
+  useEffect(() => {
+    clearBrowserCache();
+  }, []);
 
   // Rotate title every 25 seconds
   useEffect(() => {
