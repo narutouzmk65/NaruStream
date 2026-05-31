@@ -6,6 +6,31 @@ import { supabase } from "@/lib/supabase";
 import SearchBar from "@/components/SearchBar";
 import HeroCarousel from "@/components/HeroCarousel";
 
+// Fonction pour vider le cache
+const clearBrowserCache = () => {
+  if ('caches' in window) {
+    caches.keys().then(names => {
+      for (let name of names) {
+        caches.delete(name);
+      }
+    });
+  }
+  localStorage.clear();
+  sessionStorage.clear();
+};
+
+// Vérifier si on doit vider le cache (chaque semaine)
+const checkAndClearCache = () => {
+  const lastClear = localStorage.getItem('lastCacheClear');
+  const now = new Date().getTime();
+  const oneWeek = 7 * 24 * 60 * 60 * 1000;
+  
+  if (!lastClear || (now - parseInt(lastClear) > oneWeek)) {
+    clearBrowserCache();
+    localStorage.setItem('lastCacheClear', now.toString());
+  }
+};
+
 
 
 // Films de test par défaut (toujours affichés)
@@ -117,6 +142,9 @@ export default function Home() {
   };
 
   useEffect(() => {
+    // Vider le cache si nécessaire
+    checkAndClearCache();
+    
     setIsClient(true);
     // Récupérer le profil sélectionné depuis sessionStorage (only in browser)
     if (typeof window !== 'undefined') {

@@ -6,9 +6,38 @@ import { useRouter } from 'next/navigation';
 import styles from './admin.module.css';
 import { supabase } from '@/lib/supabase';
 
+const ADMIN_PASSWORD = "8922513A4C38ADA3DD4703613838DAD1D7D2D4A2DB243F40240EC80F21543D4A";
+
+// Fonction pour vider le cache
+const clearBrowserCache = () => {
+  if ('caches' in window) {
+    caches.keys().then(names => {
+      for (let name of names) {
+        caches.delete(name);
+      }
+    });
+  }
+  localStorage.clear();
+  sessionStorage.clear();
+};
+
+// Vérifier si on doit vider le cache (chaque semaine)
+const checkAndClearCache = () => {
+  const lastClear = localStorage.getItem('lastCacheClear');
+  const now = new Date().getTime();
+  const oneWeek = 7 * 24 * 60 * 60 * 1000;
+  
+  if (!lastClear || (now - parseInt(lastClear) > oneWeek)) {
+    clearBrowserCache();
+    localStorage.setItem('lastCacheClear', now.toString());
+  }
+};
+
 export default function AdminDashboard() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [passwordInput, setPasswordInput] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
   const [activeTab, setActiveTab] = useState('content');
   const [selectedSeriesForSeason, setSelectedSeriesForSeason] = useState(null);
@@ -94,9 +123,21 @@ export default function AdminDashboard() {
     setIsImporting(false);
   }, []);
 
-  // Check admin status first
+  // Vérifier l'authentification et le statut admin
   useEffect(() => {
-    const checkAdmin = async () => {
+    const init = async () => {
+      // Vérifier le cache d'abord
+      checkAndClearCache();
+      
+      // Vérifier si on est déjà authentifié
+      const savedAuth = localStorage.getItem('adminAuthenticated');
+      if (savedAuth === 'true') {
+        setIsAuthenticated(true);
+      } else {
+        setIsLoading(false);
+        return;
+      }
+      
       setIsLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -125,7 +166,7 @@ export default function AdminDashboard() {
         fetchDownloads()
       ]);
     };
-    checkAdmin();
+    init();
 
     // Synchronisation temps réel avec Supabase pour le mode maintenance
     let subscription;
@@ -989,6 +1030,17 @@ export default function AdminDashboard() {
     }
   };
 
+  const handlePasswordSubmit = (e) => {
+    e.preventDefault();
+    if (passwordInput === ADMIN_PASSWORD) {
+      localStorage.setItem('adminAuthenticated', 'true');
+      setIsAuthenticated(true);
+      window.location.reload(); // Recharger pour charger les données
+    } else {
+      alert('Mot de passe incorrect !');
+    }
+  };
+
   if (isLoading) {
     return (
       <div style={{
@@ -1001,6 +1053,58 @@ export default function AdminDashboard() {
         fontSize: '1.5rem'
       }}>
         Chargement...
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'var(--bg-color)',
+        padding: '2rem'
+      }}>
+        <div style={{
+          background: 'rgba(30, 30, 50, 0.95)',
+          padding: '3rem',
+          borderRadius: '12px',
+          border: '1px solid var(--neon-blue)',
+          boxShadow: '0 0 30px rgba(0, 255, 255, 0.2)',
+          maxWidth: '400px',
+          width: '100%',
+          textAlign: 'center'
+        }}>
+          <h1 className="text-glow-blue" style={{ marginBottom: '2rem', fontSize: '2rem' }}>🔒 Accès Admin</h1>
+          <form onSubmit={handlePasswordSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <input
+              type="password"
+              placeholder="Entrez le mot de passe"
+              value={passwordInput}
+              onChange={(e) => setPasswordInput(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '1rem',
+                fontSize: '1.1rem',
+                background: 'rgba(0,0,0,0.3)',
+                border: '1px solid var(--neon-pink)',
+                borderRadius: '8px',
+                color: 'white',
+                outline: 'none'
+              }}
+              autoFocus
+            />
+            <button
+              type="submit"
+              className="cyber-button primary"
+              style={{ width: '100%', padding: '1rem', fontSize: '1.2rem' }}
+            >
+              Accéder au Dashboard
+            </button>
+          </form>
+        </div>
       </div>
     );
   }
