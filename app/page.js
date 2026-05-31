@@ -565,18 +565,24 @@ export default function Home() {
           
           {/* Genre Sections */}
           {genres.map(genre => {
-            const normalize = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[-\s]/g, "");
+            const normalize = (str) => 
+              str.normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "") // Enlève les accents
+                .replace(/[-\s]/g, "") // Enlève espaces et tirets
+                .toLowerCase(); // Met en minuscule
             const genreMovies = filterMoviesByAge(movies.filter(movie => {
               if (!movie || !movie.category) return false;
-              const categoryLower = String(movie.category).toLowerCase();
-              const slugLower = String(genre.slug).toLowerCase();
-              const genreNameLower = String(genre.name).toLowerCase();
               
-              const normalizedCategory = normalize(categoryLower);
-              const normalizedSlug = normalize(slugLower);
-              const normalizedGenreName = normalize(genreNameLower);
+              // On divise la catégorie en plusieurs genres si elle a des virgules
+              const movieCategories = String(movie.category).toLowerCase().split(/[,;]/).map(s => s.trim());
+              const normalizedMovieCategories = movieCategories.map(normalize);
               
-              return normalizedCategory.includes(normalizedSlug) || normalizedCategory.includes(normalizedGenreName);
+              const normalizedSlug = normalize(genre.slug);
+              const normalizedGenreName = normalize(genre.name);
+              
+              return normalizedMovieCategories.some(cat => 
+                cat.includes(normalizedSlug) || cat.includes(normalizedGenreName)
+              );
             }));
             
             if (genreMovies.length === 0) return null;

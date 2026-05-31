@@ -100,25 +100,32 @@ export default function GenrePage() {
     };
 
     const genreMovies = filterMoviesByAge(movies.filter(movie => {
-      try {
-        if (!movie || !movie.category) return false;
-        const categoryLower = String(movie.category).toLowerCase();
-        const slugLower = String(normalizedSlug).toLowerCase();
-        const genreNameLower = genre?.name ? String(genre.name).toLowerCase() : '';
-        
-        // Normalize: remove accents, spaces, hyphens for better matching
-        const normalize = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[-\s]/g, "");
-        
-        const normalizedCategory = normalize(categoryLower);
-        const normalizedSlug = normalize(slugLower);
-        const normalizedGenreName = genreNameLower ? normalize(genreNameLower) : '';
-        
-        return normalizedCategory.includes(normalizedSlug) || (normalizedGenreName && normalizedCategory.includes(normalizedGenreName));
-      } catch (e) {
-        console.error('Error filtering movie:', e, movie);
-        return false;
-      }
-    }));
+    try {
+      if (!movie || !movie.category) return false;
+      
+      // Fonction de normalisation
+      const normalize = (str) => 
+        str.normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "") // Enlève les accents
+          .replace(/[-\s]/g, "") // Enlève espaces et tirets
+          .toLowerCase(); // Met en minuscule
+
+      // On divise la catégorie en plusieurs genres si elle a des virgules
+      const movieCategories = String(movie.category).toLowerCase().split(/[,;]/).map(s => s.trim());
+      const normalizedMovieCategories = movieCategories.map(normalize);
+      
+      const normalizedSlug = normalize(normalizedSlug);
+      const normalizedGenreName = genre?.name ? normalize(genre.name) : '';
+      
+      // Vérifie si la catégorie du film contient le slug OU le nom du genre
+      return normalizedMovieCategories.some(cat => 
+        cat.includes(normalizedSlug) || (normalizedGenreName && cat.includes(normalizedGenreName))
+      );
+    } catch (e) {
+      console.error('Error filtering movie:', e, movie);
+      return false;
+    }
+  }));
 
     if (error) {
       return (
