@@ -21,16 +21,11 @@ const clearBrowserCache = () => {
   sessionStorage.clear();
 };
 
-// Vérifier si on doit vider le cache (chaque semaine)
+// Vider le cache à chaque ouverture du site
 const checkAndClearCache = () => {
-  const lastClear = localStorage.getItem('lastCacheClear');
+  clearBrowserCache();
   const now = new Date().getTime();
-  const oneWeek = 7 * 24 * 60 * 60 * 1000;
-  
-  if (!lastClear || (now - parseInt(lastClear) > oneWeek)) {
-    clearBrowserCache();
-    localStorage.setItem('lastCacheClear', now.toString());
-  }
+  localStorage.setItem('lastCacheClear', now.toString());
 };
 
 export default function AdminDashboard() {
