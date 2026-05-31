@@ -99,8 +99,15 @@ export default function GenrePage({ params }) {
       const categoryLower = String(movie.category).toLowerCase();
       const slugLower = String(normalizedSlug).toLowerCase();
       const genreNameLower = genre?.name ? String(genre.name).toLowerCase() : '';
-      // Check if category contains the slug, or if it matches exactly
-      return categoryLower.includes(slugLower) || (genreNameLower && categoryLower.includes(genreNameLower));
+      
+      // Normalize: remove accents, spaces, hyphens for better matching
+      const normalize = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[-\s]/g, "");
+      
+      const normalizedCategory = normalize(categoryLower);
+      const normalizedSlug = normalize(slugLower);
+      const normalizedGenreName = genreNameLower ? normalize(genreNameLower) : '';
+      
+      return normalizedCategory.includes(normalizedSlug) || (normalizedGenreName && normalizedCategory.includes(normalizedGenreName));
     } catch (e) {
       console.error('Error filtering movie:', e, movie);
       return false;

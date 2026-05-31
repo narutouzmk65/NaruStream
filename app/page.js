@@ -565,9 +565,19 @@ export default function Home() {
           
           {/* Genre Sections */}
           {genres.map(genre => {
-            const genreMovies = filterMoviesByAge(movies.filter(movie => 
-              movie.category && movie.category.toLowerCase().includes(genre.slug.toLowerCase())
-            ));
+            const normalize = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[-\s]/g, "");
+            const genreMovies = filterMoviesByAge(movies.filter(movie => {
+              if (!movie || !movie.category) return false;
+              const categoryLower = String(movie.category).toLowerCase();
+              const slugLower = String(genre.slug).toLowerCase();
+              const genreNameLower = String(genre.name).toLowerCase();
+              
+              const normalizedCategory = normalize(categoryLower);
+              const normalizedSlug = normalize(slugLower);
+              const normalizedGenreName = normalize(genreNameLower);
+              
+              return normalizedCategory.includes(normalizedSlug) || normalizedCategory.includes(normalizedGenreName);
+            }));
             
             if (genreMovies.length === 0) return null;
             
