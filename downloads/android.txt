@@ -1,0 +1,23 @@
+# Installation NaruStream sur Android
+
+## Prérequis
+- Android 7.0 (Nougat) ou version supérieure
+- Espace de stockage disponible suffisant
+
+## Étapes d'installation
+
+1. Téléchargez le fichier APK depuis le site web NaruStream
+2. Ouvrez les paramètres de votre téléphone
+3. Allez dans "Sécurité" ou "Confidentialité"
+4. Activez "Sources inconnues" ou "Installer des apps depuis des sources inconnues"
+5. Ouvrez le gestionnaire de fichiers et allez dans le dossier "Téléchargements"
+6. Cliquez sur le fichier APK de NaruStream
+7. Cliquez sur "Installer"
+8. Une fois installé, cliquez sur "Ouvrir" pour lancer l'application
+
+## Problèmes courants
+
+Si l'installation échoue :
+- Vérifiez que vous avez activé les sources inconnues
+- Assurez-vous que votre téléphone a suffisamment d'espace de stockage
+- Essayez de télécharger à nouveau le fichier APK

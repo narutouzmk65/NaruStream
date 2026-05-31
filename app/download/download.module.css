@@ -1,0 +1,129 @@
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%);
+  color: white;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.content {
+  max-width: 1200px;
+  width: 100%;
+}
+
+.title {
+  text-align: center;
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 30px rgba(229, 9, 20, 0.5);
+}
+
+.description {
+  text-align: center;
+  color: #aaa;
+  font-size: 1.2rem;
+  margin-bottom: 3rem;
+}
+
+.platforms {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+
+.platformCard {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.platformCard:hover {
+  border-color: rgba(229, 9, 20, 0.5);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 40px rgba(229, 9, 20, 0.2);
+}
+
+.platformIcon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.platformCard h2 {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.platformCard p {
+  color: #aaa;
+  margin-bottom: 1.5rem;
+}
+
+.downloadBtn {
+  display: inline-block;
+  background: linear-gradient(135deg, #e50914 0%, #b20710 100%);
+  color: white;
+  padding: 0.8rem 2rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 700;
+  transition: all 0.3s ease;
+}
+
+.downloadBtn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(229, 9, 20, 0.5);
+}
+
+.instructions {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  padding: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.instructions h3 {
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.instructionList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.instructionItem {
+  background: rgba(255, 255, 255, 0.02);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #e50914;
+}
+
+.instructionItem strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #fff;
+  font-size: 1.1rem;
+}
+
+.instructionItem p {
+  margin: 0;
+  color: #aaa;
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 2rem;
+  }
+  
+  .platforms {
+    grid-template-columns: 1fr;
+  }
+}

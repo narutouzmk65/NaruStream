@@ -1,0 +1,466 @@
+.container {
+  min-height: 100vh;
+  background: #141414;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.content {
+  text-align: center;
+  max-width: 800px;
+}
+
+.title {
+  color: #fff;
+  font-size: 3rem;
+  margin-bottom: 2rem;
+  font-family: var(--font-inter);
+  font-weight: 500;
+}
+
+.profilesGrid {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 3rem;
+}
+
+.profileCard {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.profileCard:hover .profileAvatar,
+.profileCard:hover .addProfileAvatar {
+  border-color: #fff;
+}
+
+.profileCard:hover .profileName {
+  color: #fff;
+}
+
+.profileAvatar {
+  width: 150px;
+  height: 150px;
+  background: #333;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 3px solid transparent;
+  transition: border-color 0.2s ease;
+  margin-bottom: 0.75rem;
+}
+
+.addProfileAvatar {
+  width: 150px;
+  height: 150px;
+  background: #1a1a1a;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 3px solid transparent;
+  transition: border-color 0.2s ease;
+  margin-bottom: 0.75rem;
+  font-size: 4rem;
+  color: #737373;
+}
+
+.profileAvatarText {
+  font-size: 4rem;
+  color: #fff;
+}
+
+.profileName {
+  color: #737373;
+  font-size: 1.2rem;
+  margin: 0;
+  font-family: var(--font-inter);
+  transition: color 0.2s ease;
+}
+
+.kidBadge {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 4px 8px;
+  background: #2f9e44;
+  color: #fff;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.logoutButton {
+  padding: 0.75rem 2rem;
+  border: 1px solid #737373;
+  background: transparent;
+  color: #737373;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logoutButton:hover {
+  border-color: #fff;
+  color: #fff;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background: #141414;
+  padding: 2rem;
+  border-radius: 4px;
+  width: 100%;
+  max-width: 400px;
+  position: relative; /* Important for the hidden input */
+}
+
+.modalTitle {
+  color: #fff;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.modalForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.modalInput {
+  padding: 1rem;
+  border-radius: 4px;
+  border: 1px solid #333;
+  background: #333;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.modalInput:focus {
+  outline: none;
+  border-color: #555;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #737373;
+  font-size: 0.9rem;
+}
+
+.modalButtons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.modalButtonPrimary {
+  flex: 1;
+  padding: 0.75rem;
+  border: none;
+  background: var(--primary-color);
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.modalButtonSecondary {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #737373;
+  background: transparent;
+  color: #737373;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 1024px) {
+  .content {
+    max-width: 700px;
+  }
+
+  .title {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .content {
+    padding: 1rem;
+  }
+
+  .title {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .profilesGrid {
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .profileAvatar, .addProfileAvatar {
+    width: 120px;
+    height: 120px;
+  }
+
+  .profileAvatarText {
+    font-size: 3rem;
+  }
+
+  .addProfileAvatar {
+    font-size: 3rem;
+  }
+
+  .profileName {
+    font-size: 1rem;
+  }
+
+  .modalContent {
+    padding: 1.5rem;
+    width: 90%;
+    border-radius: 6px;
+  }
+
+  .modalTitle {
+    font-size: 1.3rem;
+  }
+
+  .modalInput {
+    padding: 0.8rem;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .profileAvatar, .addProfileAvatar {
+    width: 100px;
+    height: 100px;
+  }
+
+  .profileAvatarText, .addProfileAvatar {
+    font-size: 2.5rem;
+  }
+
+  .profilesGrid {
+    gap: 0.8rem;
+  }
+
+  .profileName {
+    font-size: 0.95rem;
+  }
+
+  .modalContent {
+    padding: 1.2rem;
+  }
+
+  .modalTitle {
+    font-size: 1.2rem;
+  }
+
+  .modalInput {
+    padding: 0.7rem;
+    font-size: 0.9rem;
+  }
+
+  .modalButtons {
+    gap: 0.8rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .title {
+    font-size: 1.3rem;
+  }
+
+  .profileAvatar, .addProfileAvatar {
+    width: 85px;
+    height: 85px;
+  }
+
+  .profileAvatarText, .addProfileAvatar {
+    font-size: 2rem;
+  }
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarSelection {
+  margin-bottom: 20px;
+}
+
+.avatarSelection h3 {
+  color: white;
+  font-size: 16px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.avatarsGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  padding: 10px;
+}
+
+.avatarOption {
+  cursor: pointer;
+  border-radius: 8px;
+  border: 3px solid transparent;
+  transition: all 0.2s ease;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.avatarOption:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.selectedAvatar {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 15px rgba(229, 9, 20, 0.5);
+  background: rgba(229, 9, 20, 0.1) !important;
+}
+
+.avatarOption img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+@media (max-width: 768px) {
+  .avatarsGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .avatarsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* PIN Modal Styles */
+.pinInputContainer {
+  display: flex;
+  justify-content: center;
+  gap: 1.25rem;
+  margin-bottom: 2.5rem;
+}
+
+.pinDigit {
+  width: 70px;
+  height: 85px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: white;
+  background: linear-gradient(145deg, #1a1a1a, #0f0f0f);
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.pinDigitFilled {
+  border-color: var(--neon-pink);
+  background: linear-gradient(145deg, rgba(229, 9, 20, 0.15), rgba(229, 9, 20, 0.05));
+  box-shadow: 0 0 30px rgba(229, 9, 20, 0.4), inset 0 0 15px rgba(229, 9, 20, 0.1);
+  transform: scale(1.05);
+}
+
+.pinDigitError {
+  border-color: #ff3232 !important;
+  box-shadow: 0 0 30px rgba(255, 50, 50, 0.4), inset 0 0 15px rgba(255, 50, 50, 0.1) !important;
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-10px); }
+  40% { transform: translateX(10px); }
+  60% { transform: translateX(-10px); }
+  80% { transform: translateX(10px); }
+}
+
+.pinHiddenInput {
+  /* Make it cover the entire modal */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  color: transparent;
+  caret-color: transparent;
+  font-size: 16px; /* Needs to be at least 16px for mobile */
+  opacity: 0;
+  cursor: text;
+  z-index: 1000;
+  padding: 2rem;
+}
+
+/* Delete Profile Button */
+.deleteProfileButton {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: #ff3232;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 15px rgba(255, 50, 50, 0.4);
+  opacity: 0;
+}
+
+.profileCard {
+  position: relative;
+}
+
+.profileCard:hover .deleteProfileButton {
+  opacity: 1;
+}
+
+.deleteProfileButton:hover {
+  background: #ff5050;
+  transform: scale(1.1);
+}
+

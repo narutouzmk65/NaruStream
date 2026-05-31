@@ -1,0 +1,19 @@
+# Installation NaruStream sur Windows
+
+## Prérequis
+- Windows 10 ou Windows 11
+- Connexion internet pour l'installation
+
+## Étapes d'installation
+
+1. Téléchargez le fichier EXE depuis le site web NaruStream
+2. Double-cliquez sur le fichier téléchargé
+3. Si une fenêtre de sécurité apparaît, cliquez sur "Plus d'infos" puis "Exécuter quand même"
+4. Suivez les instructions de l'assistant d'installation
+5. Une fois installé, lancez NaruStream depuis le menu Démarrer ou depuis le raccourci sur le bureau
+
+## Problèmes courants
+
+Si vous rencontrez des problèmes lors de l'installation, vérifiez :
+- Votre antivirus ne bloque pas le fichier
+- Vous avez les droits d'administration sur votre ordinateur

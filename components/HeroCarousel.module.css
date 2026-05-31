@@ -1,0 +1,271 @@
+.hero {
+  position: relative;
+  height: 650px;
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  padding: 4rem;
+  margin-bottom: 5rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8);
+}
+
+/* Make YouTube trailer look native */
+.heroTrailer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  /* Hide YouTube UI by scaling and cropping */
+  transform: scale(1.3);
+  transform-origin: center;
+}
+
+.muteButton {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  z-index: 5;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.muteButton:hover {
+  background: rgba(229, 9, 20, 0.8);
+  border-color: var(--primary-color);
+  box-shadow: var(--primary-glow);
+}
+
+.heroBg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  z-index: -1;
+  filter: saturate(1.3) contrast(1.1);
+  animation: pulseBg 20s infinite alternate linear;
+}
+
+.heroTrailer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+@keyframes pulseBg {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.05); }
+}
+
+.heroContent {
+  max-width: 650px;
+  position: relative;
+  z-index: 2;
+}
+
+.heroTitle {
+  font-size: 4rem;
+  margin-bottom: 1.2rem;
+  line-height: 1.1;
+  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.8);
+}
+
+.heroDesc {
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  margin-bottom: 2.5rem;
+  line-height: 1.6;
+  text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8);
+  font-weight: 300;
+}
+
+.navArrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 3rem;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+  left: 2rem;
+}
+
+.navArrow:hover {
+  background: rgba(229, 9, 20, 0.2);
+  border-color: var(--primary-color);
+  box-shadow: var(--primary-glow);
+}
+
+.dotsContainer {
+  position: absolute;
+  bottom: 2rem;
+  right: 4rem;
+  display: flex;
+  gap: 12px;
+  z-index: 10;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dot.active {
+  background: var(--accent-color);
+  box-shadow: var(--accent-glow);
+  width: 30px;
+  border-radius: 6px;
+}
+
+.dot:hover {
+  background: var(--primary-color);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 1024px) {
+  .hero {
+    height: 550px;
+    padding: 3rem;
+  }
+
+  .heroTitle {
+    font-size: 3rem;
+  }
+
+  .heroDesc {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    height: 380px;
+    padding: 1.5rem;
+    border-radius: 0;
+    margin-bottom: 3rem;
+  }
+
+  .heroTitle {
+    font-size: 1.8rem;
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8);
+  }
+
+  .heroDesc {
+    font-size: 0.95rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .navArrow {
+    width: 36px;
+    height: 36px;
+    font-size: 1.8rem;
+    left: 1rem;
+  }
+
+  .navArrow:nth-child(2) {
+    right: 1rem;
+    left: auto;
+  }
+
+  .dotsContainer {
+    bottom: 1.2rem;
+    right: 1.5rem;
+    gap: 8px;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+  }
+
+  .dot.active {
+    width: 20px;
+  }
+
+  .heroTrailer {
+    transform: scale(1.35);
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    height: 300px;
+    padding: 1.2rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .heroTitle {
+    font-size: 1.4rem;
+  }
+
+  .heroDesc {
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+  }
+
+  .dotsContainer {
+    bottom: 1rem;
+    right: 1.2rem;
+    gap: 6px;
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+  }
+
+  .dot.active {
+    width: 16px;
+  }
+
+  .navArrow {
+    width: 32px;
+    height: 32px;
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .hero {
+    height: 260px;
+    padding: 1rem;
+  }
+
+  .heroTitle {
+    font-size: 1.2rem;
+  }
+
+  .heroDesc {
+    font-size: 0.75rem;
+  }
+}

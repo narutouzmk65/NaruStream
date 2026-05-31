@@ -1,0 +1,27 @@
+# Installation NaruStream sur iOS
+
+## Prérequis
+- iPhone ou iPad avec iOS 14 ou version supérieure
+- Un compte Apple Developer (pour la signature IPA) ou TestFlight
+
+## Étapes d'installation avec TestFlight
+
+1. Demandez l'accès au TestFlight de NaruStream
+2. Recevez l'invitation par email
+3. Téléchargez TestFlight depuis l'App Store
+4. Ouvrez l'invitation et cliquez sur "Voir dans TestFlight"
+5. Installez l'application NaruStream depuis TestFlight
+
+## Étapes d'installation avec signature IPA
+
+1. Téléchargez le fichier IPA depuis le site web NaruStream
+2. Utilisez un outil de signature comme AltStore, Sideloadly ou Cydia Impactor
+3. Connectez votre iPhone/iPad à votre ordinateur
+4. Suivez les instructions de l'outil de signature pour installer l'IPA
+5. Ouvrez l'application sur votre appareil
+
+## Problèmes courants
+
+Si l'application ne s'ouvre pas :
+- Vérifiez que vous avez fait confiance au développeur dans les paramètres (Réglages > Général > VPN et gestion d'appareil)
+- Assurez-vous que l'IPA est correctement signé

@@ -1,0 +1,150 @@
+.container {
+  min-height: 100vh;
+  background: var(--bg-color);
+  padding: 2rem;
+}
+
+.header {
+  max-width: 1400px;
+  margin: 0 auto 3rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 2rem;
+  font-weight: 800;
+  font-family: var(--font-orbitron);
+  margin: 0;
+}
+
+.logo span {
+  color: var(--primary-color);
+}
+
+.nav {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.navLink {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  font-size: 1rem;
+}
+
+.navLink:hover {
+  color: var(--primary-color);
+}
+
+.content {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.welcomeSection {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.emoji {
+  font-size: 5rem;
+  margin-bottom: 1rem;
+}
+
+.title {
+  color: white;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  font-family: var(--font-orbitron);
+}
+
+.subtitle {
+  color: #aaa;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.contactForm {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 2.5rem;
+}
+
+.formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.formGroup label {
+  display: block;
+  color: white;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.formGroup input,
+.formGroup textarea,
+.formGroup select {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: white;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.formGroup input:focus,
+.formGroup textarea:focus,
+.formGroup select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.1);
+}
+
+.formGroup textarea {
+  resize: vertical;
+}
+
+.formGroup select option {
+  background: #1a1a2e;
+  color: white;
+}
+
+.successBox {
+  background: rgba(0, 255, 100, 0.05);
+  border: 1px solid rgba(0, 255, 100, 0.3);
+  border-radius: 16px;
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.successEmoji {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.successBox h2 {
+  color: white;
+  font-size: 1.75rem;
+  margin-bottom: 0.75rem;
+  font-family: var(--font-orbitron);
+}
+
+.successBox p {
+  color: #aaa;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
