@@ -119,7 +119,6 @@ export default function ProfilesPage() {
     } else {
       const profileJson = JSON.stringify(profile);
       sessionStorage.setItem("current_profile", profileJson);
-      localStorage.setItem("current_profile", profileJson);
       setTimeout(() => {
         router.push("/");
       }, 500);
@@ -150,7 +149,6 @@ export default function ProfilesPage() {
               }
               const profileJson = JSON.stringify(pinProfile);
               sessionStorage.setItem("current_profile", profileJson);
-              localStorage.setItem("current_profile", profileJson);
               setShowPinModal(false);
               setPinInput("");
               setTimeout(() => {

@@ -87,13 +87,6 @@ export default function RootLayout({ children }) {
           if (typeof window !== 'undefined') {
             let savedProfile = sessionStorage.getItem('current_profile');
             if (!savedProfile) {
-              savedProfile = localStorage.getItem('current_profile');
-              if (savedProfile) {
-                // If we found it in localStorage, also save it to sessionStorage
-                sessionStorage.setItem('current_profile', savedProfile);
-              }
-            }
-            if (!savedProfile) {
               router.push("/profiles");
             }
           }
@@ -128,13 +121,6 @@ export default function RootLayout({ children }) {
       if (user && !noProfileRequiredRoutes.includes(pathname)) {
         if (typeof window !== 'undefined') {
           let savedProfile = sessionStorage.getItem('current_profile');
-          if (!savedProfile) {
-            savedProfile = localStorage.getItem('current_profile');
-            if (savedProfile) {
-              // If we found it in localStorage, also save it to sessionStorage
-              sessionStorage.setItem('current_profile', savedProfile);
-            }
-          }
           if (!savedProfile) {
             router.push("/profiles");
           }
