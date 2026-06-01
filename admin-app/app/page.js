@@ -144,14 +144,14 @@ export default function AdminDashboard() {
       // Vérifier si l'utilisateur est connecté via Supabase
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        router.push('/login');
+        window.location.href = 'https://naru-stream.vercel.app/login';
         return;
       }
       
       // Vérifier si l'utilisateur est admin dans la BDD
       const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single();
       if (!profile?.is_admin) {
-        router.push('/');
+        window.location.href = 'https://naru-stream.vercel.app/';
         return;
       }
       setIsAdmin(true);
