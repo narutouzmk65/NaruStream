@@ -76,7 +76,7 @@ export default function AdminDashboard() {
   const [moviePoster, setMoviePoster] = useState('');
   const [trailerUrl, setTrailerUrl] = useState('');
   const [releaseYear, setReleaseYear] = useState('');
-  const [category, setCategory] = useState([]);
+  const [category, setCategory] = useState('');
   const [ageRating, setAgeRating] = useState('10+');
   const [platform, setPlatform] = useState('');
   const [contentStatus, setContentStatus] = useState('sortie');
@@ -91,7 +91,7 @@ export default function AdminDashboard() {
   const [newSeriesPoster, setNewSeriesPoster] = useState('');
   const [newSeriesTrailer, setNewSeriesTrailer] = useState('');
   const [newSeriesYear, setNewSeriesYear] = useState('');
-  const [newSeriesCategory, setNewSeriesCategory] = useState([]);
+  const [newSeriesCategory, setNewSeriesCategory] = useState('');
   const [newSeriesAgeRating, setNewSeriesAgeRating] = useState('10+');
   const [newSeriesPlatform, setNewSeriesPlatform] = useState('');
   const [newSeriesStatus, setNewSeriesStatus] = useState('sortie');
@@ -426,7 +426,7 @@ export default function AdminDashboard() {
           poster_url: moviePoster,
           trailer_url: trailerUrl || null,
           release_year: releaseYear,
-          category: category.join(','),
+          category: category,
           content_type: contentType,
           age_rating: ageRating,
           platform: platform || null,
@@ -481,7 +481,7 @@ export default function AdminDashboard() {
       setMovieDesc('');
       setMoviePoster('');
       setReleaseYear('');
-      setCategory([]);
+      setCategory('');
       setServerName('');
       setStreamUrl('');
       setQuality('');
@@ -509,7 +509,7 @@ export default function AdminDashboard() {
           poster_url: newSeriesPoster,
           trailer_url: newSeriesTrailer,
           release_year: newSeriesYear,
-          category: newSeriesCategory.join(','),
+          category: newSeriesCategory,
           content_type: 'serie',
           age_rating: newSeriesAgeRating,
           platform: newSeriesPlatform || null,
@@ -535,7 +535,7 @@ export default function AdminDashboard() {
         setNewSeriesPoster('');
         setNewSeriesTrailer('');
         setNewSeriesYear('');
-        setNewSeriesCategory([]);
+        setNewSeriesCategory('');
         setNewSeriesAgeRating('10+');
         setNewSeriesPlatform('');
         fetchMovies();
@@ -771,7 +771,7 @@ export default function AdminDashboard() {
   const handleEditClick = (movie) => {
     setEditingMovie({ 
       ...movie, 
-      category: movie.category ? movie.category.split(',') : [] 
+      category: movie.category || '' 
     });
   };
 
@@ -788,7 +788,7 @@ export default function AdminDashboard() {
       poster_url: editingMovie.poster_url,
       trailer_url: editingMovie.trailer_url || null,
       release_year: editingMovie.release_year,
-      category: Array.isArray(editingMovie.category) ? editingMovie.category.join(',') : editingMovie.category,
+      category: editingMovie.category,
       content_type: editingMovie.content_type,
       age_rating: editingMovie.age_rating || '10+',
       platform: editingMovie.platform || null,
@@ -1417,13 +1417,13 @@ export default function AdminDashboard() {
                     <input type="text" className={styles.cyberInput} value={releaseYear} onChange={(e) => setReleaseYear(e.target.value)} placeholder="Ex: 2021" />
                   </div>
                   <div className={styles.formGroup}>
-                    <label>Catégories</label>
+                    <label>Catégorie</label>
                     <select 
-                      multiple 
                       className={styles.cyberInput}
                       value={category}
-                      onChange={(e) => setCategory(Array.from(e.target.selectedOptions, option => option.value))}
+                      onChange={(e) => setCategory(e.target.value)}
                     >
+                      <option value="">Sélectionner une catégorie</option>
                       {GENRES.map(genre => (
                         <option key={genre} value={genre}>{genre}</option>
                       ))}
@@ -1598,13 +1598,13 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className={styles.formGroup}>
-                <label>Catégories</label>
+                <label>Catégorie</label>
                 <select 
-                  multiple 
                   className={styles.cyberInput}
                   value={newSeriesCategory}
-                  onChange={(e) => setNewSeriesCategory(Array.from(e.target.selectedOptions, option => option.value))}
+                  onChange={(e) => setNewSeriesCategory(e.target.value)}
                 >
+                  <option value="">Sélectionner une catégorie</option>
                   {GENRES.map(genre => (
                     <option key={genre} value={genre}>{genre}</option>
                   ))}
@@ -2594,13 +2594,13 @@ export default function AdminDashboard() {
                   <input type="text" className={styles.cyberInput} value={editingMovie.release_year || ''} onChange={(e) => handleEditChange('release_year', e.target.value)} />
                 </div>
                 <div className={styles.formGroup}>
-                  <label>Catégories</label>
+                  <label>Catégorie</label>
                   <select 
-                    multiple 
                     className={styles.cyberInput}
-                    value={editingMovie.category || []}
-                    onChange={(e) => handleEditChange('category', Array.from(e.target.selectedOptions, option => option.value))}
+                    value={editingMovie.category || ''}
+                    onChange={(e) => handleEditChange('category', e.target.value)}
                   >
+                    <option value="">Sélectionner une catégorie</option>
                     {GENRES.map(genre => (
                       <option key={genre} value={genre}>{genre}</option>
                     ))}
