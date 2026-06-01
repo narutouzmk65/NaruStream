@@ -254,9 +254,13 @@ export default function ProfilesPage() {
         </div>
         <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
           {isAdmin && (
-            <button 
-              onClick={() => router.push("/admin")} 
+            <a 
+              href="https://narustream-admin.vercel.app" 
+              target="_blank"
+              rel="noopener noreferrer"
               style={{
+                textDecoration: 'none',
+                display: 'inline-block',
                 padding: '0.75rem 1.5rem',
                 fontSize: '1rem',
                 fontWeight: 'bold',
@@ -278,7 +282,7 @@ export default function ProfilesPage() {
               }}
             >
               🔧 Admin Dashboard
-            </button>
+            </a>
           )}
           <button onClick={handleLogout} className={styles.logoutButton}>
             Se déconnecter
