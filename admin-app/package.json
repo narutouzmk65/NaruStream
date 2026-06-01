@@ -1,0 +1,23 @@
+{
+  "name": "narustream-admin",
+  "version": "1.0.0",
+  "private": true,
+  "description": "NaruStream Admin Dashboard",
+  "author": "Your Name",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.106.2",
+    "next": "16.2.6",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "eslint": "^9",
+    "eslint-config-next": "16.2.6"
+  }
+}
