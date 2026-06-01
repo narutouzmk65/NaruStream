@@ -255,7 +255,7 @@ export default function ProfilesPage() {
         <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
           {isAdmin && (
             <a 
-              href="https://narustream-admin.vercel.app" 
+              href="https://naru-stream-admin.vercel.app" 
               target="_blank"
               rel="noopener noreferrer"
               style={{
