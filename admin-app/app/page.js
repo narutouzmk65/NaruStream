@@ -176,6 +176,8 @@ export default function AdminDashboard() {
           fetchDownloads(),
           fetchBanners()
         ]);
+      } else {
+        setIsAuthenticated(false);
       }
       
       setIsLoading(false);
