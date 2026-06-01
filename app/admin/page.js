@@ -139,43 +139,44 @@ export default function AdminDashboard() {
       // Vérifier le cache d'abord
       checkAndClearCache();
       
-      // Vérifier si on est déjà authentifié
-      const savedAuth = localStorage.getItem('adminAuthenticated');
-      if (savedAuth === 'true') {
-        setIsAuthenticated(true);
-      } else {
-        setIsLoading(false);
-        return;
-      }
-      
       setIsLoading(true);
+      
+      // Vérifier si l'utilisateur est connecté via Supabase
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         router.push('/login');
         return;
       }
+      
+      // Vérifier si l'utilisateur est admin dans la BDD
       const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single();
       if (!profile?.is_admin) {
         router.push('/');
         return;
       }
       setIsAdmin(true);
-      setIsLoading(false);
       
-      // Load all data
-      await Promise.all([
-        fetchMovies(),
-        fetchRequests(),
-        fetchSagas(),
-        fetchUsers(),
-        fetchStreams(),
-        fetchStreamLogs(),
-        fetchSeries(),
-        fetchMaintenanceMode(),
-        fetchContactMessages(),
-        fetchDownloads(),
-        fetchBanners()
-      ]);
+      // Vérifier si on a déjà entré le mot de passe (sessionStorage seulement)
+      const savedAuth = sessionStorage.getItem('adminAuthenticated');
+      if (savedAuth === 'true') {
+        setIsAuthenticated(true);
+        // Load all data
+        await Promise.all([
+          fetchMovies(),
+          fetchRequests(),
+          fetchSagas(),
+          fetchUsers(),
+          fetchStreams(),
+          fetchStreamLogs(),
+          fetchSeries(),
+          fetchMaintenanceMode(),
+          fetchContactMessages(),
+          fetchDownloads(),
+          fetchBanners()
+        ]);
+      }
+      
+      setIsLoading(false);
     };
     init();
 
@@ -1103,21 +1104,33 @@ export default function AdminDashboard() {
     }
   };
 
-  const handlePasswordSubmit = (e) => {
+  const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     if (passwordInput === ADMIN_PASSWORD) {
-      localStorage.setItem('adminAuthenticated', 'true');
+      sessionStorage.setItem('adminAuthenticated', 'true');
       setIsAuthenticated(true);
-      window.location.reload(); // Recharger pour charger les données
+      // Load all data now that we're authenticated
+      await Promise.all([
+        fetchMovies(),
+        fetchRequests(),
+        fetchSagas(),
+        fetchUsers(),
+        fetchStreams(),
+        fetchStreamLogs(),
+        fetchSeries(),
+        fetchMaintenanceMode(),
+        fetchContactMessages(),
+        fetchDownloads(),
+        fetchBanners()
+      ]);
     } else {
       alert('Mot de passe incorrect !');
     }
   };
   
   const handleAdminLogout = () => {
-    localStorage.removeItem('adminAuthenticated');
+    sessionStorage.removeItem('adminAuthenticated');
     setIsAuthenticated(false);
-    window.location.reload();
   };
 
   if (isLoading) {
