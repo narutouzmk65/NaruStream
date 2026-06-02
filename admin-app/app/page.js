@@ -8,7 +8,8 @@ import { useRouter } from 'next/navigation';
 import styles from './admin.module.css';
 import { supabase } from '@/lib/supabase';
 
-const ADMIN_PASSWORD_HASH = "01d03a4b04957264b3e8c0825d4eaaa7f60b79ff98f2ab6b8806821d36e9aa6f";
+// Hash SHA-256 de (email + ':' + password) - mot de passe jamais stocké en clair
+const ADMIN_CREDENTIALS_HASH = "1b58eeb107d5d71f99cde61eadd01e84b9b8eedf6c7989a9f29f1230d9868079";
 
 // Liste des genres disponibles
 const GENRES = [
@@ -144,97 +145,72 @@ export default function AdminDashboard() {
     e.preventDefault();
     setIsLoading(true);
     setErrorMessage('');
-    
+
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: loginEmail,
-        password: loginPassword
-      });
-      
-      if (error) {
-        setErrorMessage("Erreur connexion: " + error.message);
-        setIsLoading(false);
-        return;
+      const combined = loginEmail.trim() + ':' + loginPassword;
+      const encoder = new TextEncoder();
+      const data = encoder.encode(combined);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+      if (hashHex === ADMIN_CREDENTIALS_HASH) {
+        sessionStorage.setItem('adminAuthenticated', 'true');
+        setShowLoginForm(false);
+        setIsAdmin(true);
+        setIsAuthenticated(true);
+        await Promise.all([
+          fetchMovies(),
+          fetchRequests(),
+          fetchSagas(),
+          fetchUsers(),
+          fetchStreams(),
+          fetchStreamLogs(),
+          fetchSeries(),
+          fetchMaintenanceMode(),
+          fetchContactMessages(),
+          fetchDownloads(),
+          fetchBanners()
+        ]);
+      } else {
+        setErrorMessage('Email ou mot de passe incorrect !');
       }
-      
-      // Maintenant on vérifie le statut admin
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        setErrorMessage("Utilisateur non trouvé après connexion");
-        setIsLoading(false);
-        return;
-      }
-      
-      const { data: profile, error: profileError } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single();
-      if (profileError || !profile?.is_admin) {
-        await supabase.auth.signOut();
-        setErrorMessage("Ce compte n'est pas admin !");
-        setIsLoading(false);
-        return;
-      }
-      
-      // C'est bon, on est admin !
-      setShowLoginForm(false);
-      setIsAdmin(true);
-      
-      // On attend que l'utilisateur entre le mot de passe admin, puis on charge les données
-      setIsLoading(false);
-      
     } catch (err) {
-      setErrorMessage("Erreur: " + err.message);
-      setIsLoading(false);
+      setErrorMessage('Erreur: ' + err.message);
     }
+
+    setIsLoading(false);
   };
   
-  // Vérifier l'authentification et le statut admin
+  // Vérifier l'authentification
   useEffect(() => {
     const init = async () => {
-      // Vérifier le cache d'abord
       checkAndClearCache();
-      
       setIsLoading(true);
-      
-      try {
-        // Détecter si on est en développement local
-        const isLocal = window.location.hostname === 'localhost';
-        
-        if (isLocal) {
-          // EN LOCAL : On saute la vérification de session (car ports différents), on demande juste le mot de passe !
-          console.log("🏠 Mode LOCAL détecté, vérification admin simplifiée");
-          setIsAdmin(true);
-          setIsLoading(false);
-          
-          // Vérifier si on a déjà entré le mot de passe pour charger les données
-          const savedAuth = sessionStorage.getItem('adminAuthenticated');
-          if (savedAuth === 'true') {
-            console.log("✅ Mot de passe déjà entré, chargement des données...");
-            setIsAuthenticated(true);
-            await Promise.all([
-              fetchMovies(),
-              fetchRequests(),
-              fetchSagas(),
-              fetchUsers(),
-              fetchStreams(),
-              fetchStreamLogs(),
-              fetchSeries(),
-              fetchMaintenanceMode(),
-              fetchContactMessages(),
-              fetchDownloads(),
-              fetchBanners()
-            ]);
-          }
-        } else {
-          // EN PRODUCTION : On affiche d'abord le formulaire de connexion, pas d'erreur !
-          console.log("🌍 Mode PRODUCTION détecté, affichage formulaire connexion...");
-          setShowLoginForm(true);
-          setIsLoading(false);
-        }
-      } catch (err) {
-        console.error("Erreur init:", err);
-        // En cas d'erreur, on affiche le formulaire de connexion
+
+      // Vérifier si déjà authentifié en session
+      const savedAuth = sessionStorage.getItem('adminAuthenticated');
+      if (savedAuth === 'true') {
+        setIsAdmin(true);
+        setIsAuthenticated(true);
+        await Promise.all([
+          fetchMovies(),
+          fetchRequests(),
+          fetchSagas(),
+          fetchUsers(),
+          fetchStreams(),
+          fetchStreamLogs(),
+          fetchSeries(),
+          fetchMaintenanceMode(),
+          fetchContactMessages(),
+          fetchDownloads(),
+          fetchBanners()
+        ]);
+      } else {
         setShowLoginForm(true);
-        setIsLoading(false);
       }
+
+      setIsLoading(false);
     };
     init();
   }, []);
@@ -1164,39 +1140,9 @@ export default function AdminDashboard() {
     }
   };
 
+  // handlePasswordSubmit n'est plus utilisé (login géré par handleDirectLogin)
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const encoder = new TextEncoder();
-      const data = encoder.encode(passwordInput);
-      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-
-      if (hashHex === ADMIN_PASSWORD_HASH) {
-        sessionStorage.setItem('adminAuthenticated', 'true');
-        setIsAuthenticated(true);
-        // Load all data now that we're authenticated
-        await Promise.all([
-          fetchMovies(),
-          fetchRequests(),
-          fetchSagas(),
-          fetchUsers(),
-          fetchStreams(),
-          fetchStreamLogs(),
-          fetchSeries(),
-          fetchMaintenanceMode(),
-          fetchContactMessages(),
-          fetchDownloads(),
-          fetchBanners()
-        ]);
-      } else {
-        alert('Mot de passe incorrect !');
-      }
-    } catch (err) {
-      console.error(err);
-      alert('Erreur lors de la vérification du mot de passe');
-    }
   };
   
   const handleAdminLogout = () => {
