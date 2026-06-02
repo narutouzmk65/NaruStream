@@ -150,39 +150,48 @@ export default function AdminDashboard() {
         const isLocal = window.location.hostname === 'localhost';
         const mainSiteUrl = isLocal ? 'http://localhost:3000' : 'https://narustream-omega.vercel.app';
         
-        // Vérifier si l'utilisateur est connecté via Supabase
-        console.log("🔍 Vérification de l'utilisateur Supabase...");
-        const { data: { user }, error: userError } = await supabase.auth.getUser();
-        if (userError) {
-          console.error("❌ Erreur Supabase auth:", userError);
-          setErrorMessage("Erreur auth: " + userError.message);
-          setIsLoading(false);
-          return;
+        if (isLocal) {
+          // EN LOCAL : On saute la vérification de session (car ports différents), on demande juste le mot de passe !
+          console.log("🏠 Mode LOCAL détecté, vérification admin simplifiée");
+          setIsAdmin(true);
+        } else {
+          // EN PRODUCTION : On fait la vérification complète
+          console.log("🌍 Mode PRODUCTION détecté");
+          
+          // Vérifier si l'utilisateur est connecté via Supabase
+          console.log("🔍 Vérification de l'utilisateur Supabase...");
+          const { data: { user }, error: userError } = await supabase.auth.getUser();
+          if (userError) {
+            console.error("❌ Erreur Supabase auth:", userError);
+            setErrorMessage("Erreur auth: " + userError.message);
+            setIsLoading(false);
+            return;
+          }
+          if (!user) {
+            console.log("⚠️ Utilisateur non connecté, redirection vers login...");
+            window.location.href = `${mainSiteUrl}/login`;
+            return;
+          }
+          console.log("✅ Utilisateur connecté:", user.email);
+          
+          // Vérifier si l'utilisateur est admin dans la BDD
+          console.log("🔍 Vérification du statut admin...");
+          const { data: profile, error: profileError } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single();
+          if (profileError) {
+            console.error("❌ Erreur profil:", profileError);
+            setErrorMessage("Erreur profil: " + profileError.message);
+            setIsLoading(false);
+            return;
+          }
+          console.log("📋 Profil trouvé:", profile);
+          if (!profile?.is_admin) {
+            console.log("⚠️ Utilisateur pas admin, redirection vers accueil...");
+            window.location.href = mainSiteUrl;
+            return;
+          }
+          console.log("✅ Utilisateur est admin !");
+          setIsAdmin(true);
         }
-        if (!user) {
-          console.log("⚠️ Utilisateur non connecté, redirection vers login...");
-          window.location.href = `${mainSiteUrl}/login`;
-          return;
-        }
-        console.log("✅ Utilisateur connecté:", user.email);
-        
-        // Vérifier si l'utilisateur est admin dans la BDD
-        console.log("🔍 Vérification du statut admin...");
-        const { data: profile, error: profileError } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single();
-        if (profileError) {
-          console.error("❌ Erreur profil:", profileError);
-          setErrorMessage("Erreur profil: " + profileError.message);
-          setIsLoading(false);
-          return;
-        }
-        console.log("📋 Profil trouvé:", profile);
-        if (!profile?.is_admin) {
-          console.log("⚠️ Utilisateur pas admin, redirection vers accueil...");
-          window.location.href = mainSiteUrl;
-          return;
-        }
-        console.log("✅ Utilisateur est admin !");
-        setIsAdmin(true);
         
         // Vérifier si on a déjà entré le mot de passe (sessionStorage seulement)
         const savedAuth = sessionStorage.getItem('adminAuthenticated');
@@ -1230,11 +1239,11 @@ export default function AdminDashboard() {
           <h1 className="text-glow-blue" style={{ marginBottom: '1rem', fontSize: '2rem' }}>🔒 Accès Admin</h1>
           
           <div style={{ marginBottom: '2rem', textAlign: 'left', color: '#aaa', lineHeight: '1.6' }}>
-            <p style={{ marginBottom: '0.5rem' }}>⚠️ Avant de continuer :</p>
-            <ul style={{ paddingLeft: '1.5rem' }}>
-              <li>Tu dois être connecté sur le site principal (https://narustream-omega.vercel.app</li>
-              <li>Tu dois avoir un profil admin dans la base de données</li>
-            </ul>
+            <p style={{ marginBottom: '0.5rem' }}>
+              {window.location.hostname === 'localhost' 
+                ? "🏠 Mode LOCAL : Entrez simplement le mot de passe admin !"
+                : "⚠️ Avant de continuer : Tu dois être connecté sur le site principal et avoir un profil admin"}
+            </p>
           </div>
           
           <form onSubmit={handlePasswordSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
