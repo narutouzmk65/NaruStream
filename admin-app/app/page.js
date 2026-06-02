@@ -9,7 +9,7 @@ import styles from './admin.module.css';
 import { supabase } from '@/lib/supabase';
 
 // Hash SHA-256 de (email + ':' + password) - mot de passe jamais stocké en clair
-const ADMIN_CREDENTIALS_HASH = "1b58eeb107d5d71f99cde61eadd01e84b9b8eedf6c7989a9f29f1230d9868079";
+const ADMIN_CREDENTIALS_HASH = "9841aa1218ae612f24ae9f77f67e59d2a8e881d6be8bb1b3031548efc66ca588";
 
 // Liste des genres disponibles
 const GENRES = [
