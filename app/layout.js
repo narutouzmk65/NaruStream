@@ -55,7 +55,8 @@ export default function RootLayout({ children }) {
   // Vider le cache à chaque chargement de l'app
   useEffect(() => {
     clearBrowserCache();
-  }, []);
+    router.refresh();
+  }, [router]);
 
   // Rotate title every 25 seconds
   useEffect(() => {
