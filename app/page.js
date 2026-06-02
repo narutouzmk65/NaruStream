@@ -487,8 +487,6 @@ export default function Home() {
                           fontSize: '0.7rem',
                           fontWeight: '700',
                           textShadow: '0 1px 3px rgba(0,0,0,0.4)',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.5px',
                           boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
                         }}>
                           {movie.status === 'sortie' ? 'SORTIE' : 'À VENIR'}
@@ -527,6 +525,10 @@ export default function Home() {
                           {movie.platform}
                         </span>
                       )}
+                    </div>
+                    {/* Watch Now Button Overlay */}
+                    <div className={styles.watchOverlay}>
+                      <button className={styles.watchButton}>▶ Voir maintenant</button>
                     </div>
                   </div>
                   <div className={styles.movieInfo}>
@@ -582,6 +584,10 @@ export default function Home() {
                             </span>
                           )}
                         </div>
+                    {/* Watch Now Button Overlay */}
+                    <div className={styles.watchOverlay}>
+                      <button className={styles.watchButton}>▶ Voir maintenant</button>
+                    </div>
                   </div>
                   <div className={styles.movieInfo}>
                     <h4 className={styles.movieTitle}>{movie.title}</h4>
@@ -665,36 +671,40 @@ export default function Home() {
                           </span>
                         )}
                         <img src={movie.poster_url} alt={movie.title} className={styles.moviePoster} />
-                        <div className={styles.matchPercentage}>{getRandomPercentage(movie.id)}%</div>
-                        {/* Age rating in top-right, same size as NOUVEAU */}
-                        <div style={{ 
-                          position: 'absolute', 
-                          top: '0.75rem', 
-                          right: '0.75rem', 
-                          display: 'flex', 
-                          gap: '0.5rem', 
-                          flexWrap: 'wrap'
+                    <div className={styles.matchPercentage}>{getRandomPercentage(movie.id)}%</div>
+                    {/* Age rating in top-right, same size as NOUVEAU */}
+                    <div style={{ 
+                      position: 'absolute', 
+                      top: '0.75rem', 
+                      right: '0.75rem', 
+                      display: 'flex', 
+                      gap: '0.5rem', 
+                      flexWrap: 'wrap'
+                    }}>
+                      {movie.age_rating && (
+                        <span style={{
+                          background: getAgeRatingNumber(movie.age_rating) <=10 ? 'linear-gradient(135deg, #4ade80, #22c55e)' : 
+                                      getAgeRatingNumber(movie.age_rating) <=12 ? 'linear-gradient(135deg, #60a5fa, #3b82f6)' :
+                                      getAgeRatingNumber(movie.age_rating) <=16 ? 'linear-gradient(135deg, #fbbf24, #f59e0b)' :
+                                      'linear-gradient(135deg, #ef4444, #dc2626)',
+                          color: 'white',
+                          padding: '0.4rem 0.7rem',
+                          borderRadius: '8px',
+                          fontSize: '0.75rem',
+                          fontWeight: '800',
+                          textShadow: '0 2px 4px rgba(0,0,0,0.5)',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.4)'
                         }}>
-                          {movie.age_rating && (
-                            <span style={{
-                              background: getAgeRatingNumber(movie.age_rating) <=10 ? 'linear-gradient(135deg, #4ade80, #22c55e)' : 
-                                          getAgeRatingNumber(movie.age_rating) <=12 ? 'linear-gradient(135deg, #60a5fa, #3b82f6)' :
-                                          getAgeRatingNumber(movie.age_rating) <=16 ? 'linear-gradient(135deg, #fbbf24, #f59e0b)' :
-                                          'linear-gradient(135deg, #ef4444, #dc2626)',
-                              color: 'white',
-                              padding: '0.4rem 0.7rem',
-                              borderRadius: '8px',
-                              fontSize: '0.75rem',
-                              fontWeight: '800',
-                              textShadow: '0 2px 4px rgba(0,0,0,0.5)',
-                              boxShadow: '0 4px 12px rgba(0,0,0,0.4)'
-                            }}>
-                              {movie.age_rating}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <div className={styles.movieInfo}>
+                          {movie.age_rating}
+                        </span>
+                      )}
+                    </div>
+                    {/* Watch Now Button Overlay */}
+                    <div className={styles.watchOverlay}>
+                      <button className={styles.watchButton}>▶ Voir maintenant</button>
+                    </div>
+                  </div>
+                  <div className={styles.movieInfo}>
                         <h4 className={styles.movieTitle}>{movie.title}</h4>
                         {movie.platform && (
                           <span style={{
@@ -767,36 +777,40 @@ export default function Home() {
                           </span>
                         )}
                         <img src={movie.poster_url} alt={movie.title} className={styles.moviePoster} />
-                        <div className={styles.matchPercentage}>{getRandomPercentage(movie.id)}%</div>
-                        {/* Age rating in top-right, same size as NOUVEAU */}
-                        <div style={{ 
-                          position: 'absolute', 
-                          top: '0.75rem', 
-                          right: '0.75rem', 
-                          display: 'flex', 
-                          gap: '0.5rem', 
-                          flexWrap: 'wrap'
+                    <div className={styles.matchPercentage}>{getRandomPercentage(movie.id)}%</div>
+                    {/* Age rating in top-right, same size as NOUVEAU */}
+                    <div style={{ 
+                      position: 'absolute', 
+                      top: '0.75rem', 
+                      right: '0.75rem', 
+                      display: 'flex', 
+                      gap: '0.5rem', 
+                      flexWrap: 'wrap'
+                    }}>
+                      {movie.age_rating && (
+                        <span style={{
+                          background: getAgeRatingNumber(movie.age_rating) <=10 ? 'linear-gradient(135deg, #4ade80, #22c55e)' : 
+                                      getAgeRatingNumber(movie.age_rating) <=12 ? 'linear-gradient(135deg, #60a5fa, #3b82f6)' :
+                                      getAgeRatingNumber(movie.age_rating) <=16 ? 'linear-gradient(135deg, #fbbf24, #f59e0b)' :
+                                      'linear-gradient(135deg, #ef4444, #dc2626)',
+                          color: 'white',
+                          padding: '0.4rem 0.7rem',
+                          borderRadius: '8px',
+                          fontSize: '0.75rem',
+                          fontWeight: '800',
+                          textShadow: '0 2px 4px rgba(0,0,0,0.5)',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.4)'
                         }}>
-                          {movie.age_rating && (
-                            <span style={{
-                              background: getAgeRatingNumber(movie.age_rating) <=10 ? 'linear-gradient(135deg, #4ade80, #22c55e)' : 
-                                          getAgeRatingNumber(movie.age_rating) <=12 ? 'linear-gradient(135deg, #60a5fa, #3b82f6)' :
-                                          getAgeRatingNumber(movie.age_rating) <=16 ? 'linear-gradient(135deg, #fbbf24, #f59e0b)' :
-                                          'linear-gradient(135deg, #ef4444, #dc2626)',
-                              color: 'white',
-                              padding: '0.4rem 0.7rem',
-                              borderRadius: '8px',
-                              fontSize: '0.75rem',
-                              fontWeight: '800',
-                              textShadow: '0 2px 4px rgba(0,0,0,0.5)',
-                              boxShadow: '0 4px 12px rgba(0,0,0,0.4)'
-                            }}>
-                              {movie.age_rating}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <div className={styles.movieInfo}>
+                          {movie.age_rating}
+                        </span>
+                      )}
+                    </div>
+                    {/* Watch Now Button Overlay */}
+                    <div className={styles.watchOverlay}>
+                      <button className={styles.watchButton}>▶ Voir maintenant</button>
+                    </div>
+                  </div>
+                  <div className={styles.movieInfo}>
                         <h4 className={styles.movieTitle}>{movie.title}</h4>
                         {movie.platform && (
                           <span style={{
