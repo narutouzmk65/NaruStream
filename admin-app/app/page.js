@@ -145,29 +145,6 @@ export default function AdminDashboard() {
     setIsLoading(true);
     setErrorMessage('');
     
-    // Bypass administrateur codé en dur
-    if (loginEmail === "toto@stream.fr" && loginPassword === "8922513A4C38ADA3DD4703613838DAD1D7D2D4A2DB243F40240EC80F21543D4A") {
-      setShowLoginForm(false);
-      setIsAdmin(true);
-      sessionStorage.setItem('adminAuthenticated', 'true');
-      setIsAuthenticated(true);
-      await Promise.all([
-        fetchMovies(),
-        fetchRequests(),
-        fetchSagas(),
-        fetchUsers(),
-        fetchStreams(),
-        fetchStreamLogs(),
-        fetchSeries(),
-        fetchMaintenanceMode(),
-        fetchContactMessages(),
-        fetchDownloads(),
-        fetchBanners()
-      ]);
-      setIsLoading(false);
-      return;
-    }
-    
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email: loginEmail,
@@ -1597,22 +1574,32 @@ export default function AdminDashboard() {
                     <label>Année de sortie</label>
                     <input type="text" className={styles.cyberInput} value={releaseYear} onChange={(e) => setReleaseYear(e.target.value)} placeholder="Ex: 2021" />
                   </div>
-                  <div className={styles.formGroup}>
-                    <label>Catégorie</label>
-                    <select 
-                      className={styles.cyberInput}
-                      value={category}
-                      onChange={(e) => setCategory(e.target.value)}
-                    >
-                      <option value="">Sélectionner une catégorie</option>
+                  <div className={styles.formGroup} style={{ gridColumn: 'span 2' }}>
+                    <label>Catégories (Plusieurs possibles)</label>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem', background: 'rgba(0,0,0,0.3)', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}>
                       {GENRES.map(genre => (
-                        <option key={genre} value={genre}>{genre}</option>
+                        <label key={genre} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.9rem' }}>
+                          <input 
+                            type="checkbox" 
+                            checked={category.includes(genre)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setCategory(prev => prev ? `${prev}, ${genre}` : genre);
+                              } else {
+                                setCategory(prev => prev.split(', ').filter(c => c !== genre).join(', '));
+                              }
+                            }}
+                            style={{ cursor: 'pointer' }}
+                          />
+                          {genre}
+                        </label>
                       ))}
-                    </select>
+                    </div>
                   </div>
                   <div className={styles.formGroup}>
                     <label>Classification d'âge</label>
                     <select className={styles.cyberInput} value={ageRating} onChange={(e) => setAgeRating(e.target.value)}>
+                      <option value="Tout public">Tout public</option>
                       <option value="10+">10+</option>
                       <option value="12+">12+</option>
                       <option value="16+">16+</option>
@@ -1795,6 +1782,7 @@ export default function AdminDashboard() {
                 <div className={styles.formGroup}>
                   <label>Classification d'âge</label>
                   <select className={styles.cyberInput} value={newSeriesAgeRating} onChange={(e) => setNewSeriesAgeRating(e.target.value)}>
+                    <option value="Tout public">Tout public</option>
                     <option value="10+">10+</option>
                     <option value="12+">12+</option>
                     <option value="16+">16+</option>

@@ -40,6 +40,7 @@ export default function MovieDetail() {
   // Helper function to convert age rating string to number
   const getAgeRatingNumber = (ageRating) => {
     if (!ageRating) return 10;
+    if (ageRating.toLowerCase().includes('tout public')) return 0;
     const match = ageRating.match(/(\d+)/);
     return match ? parseInt(match[1], 10) : 10;
   };
