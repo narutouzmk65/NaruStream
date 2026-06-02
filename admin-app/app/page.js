@@ -157,47 +157,28 @@ export default function AdminDashboard() {
         return;
       }
       
-      setShowLoginForm(false);
-      // Maintenant on refait l'initialisation
-      const initAfterLogin = async () => {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          setErrorMessage("Utilisateur non trouvé après connexion");
-          setIsLoading(false);
-          return;
-        }
-        
-        const { data: profile, error: profileError } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single();
-        if (profileError || !profile?.is_admin) {
-          await supabase.auth.signOut();
-          setErrorMessage("Ce compte n'est pas admin !");
-          setIsLoading(false);
-          return;
-        }
-        
-        setIsAdmin(true);
-        
-        const savedAuth = sessionStorage.getItem('adminAuthenticated');
-        if (savedAuth === 'true') {
-          setIsAuthenticated(true);
-          await Promise.all([
-            fetchMovies(),
-            fetchRequests(),
-            fetchSagas(),
-            fetchUsers(),
-            fetchStreams(),
-            fetchStreamLogs(),
-            fetchSeries(),
-            fetchMaintenanceMode(),
-            fetchContactMessages(),
-            fetchDownloads(),
-            fetchBanners()
-          ]);
-        }
+      // Maintenant on vérifie le statut admin
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setErrorMessage("Utilisateur non trouvé après connexion");
         setIsLoading(false);
-      };
+        return;
+      }
       
-      await initAfterLogin();
+      const { data: profile, error: profileError } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single();
+      if (profileError || !profile?.is_admin) {
+        await supabase.auth.signOut();
+        setErrorMessage("Ce compte n'est pas admin !");
+        setIsLoading(false);
+        return;
+      }
+      
+      // C'est bon, on est admin !
+      setShowLoginForm(false);
+      setIsAdmin(true);
+      
+      // On attend que l'utilisateur entre le mot de passe admin, puis on charge les données
+      setIsLoading(false);
       
     } catch (err) {
       setErrorMessage("Erreur: " + err.message);
@@ -243,56 +224,9 @@ export default function AdminDashboard() {
             ]);
           }
         } else {
-          // EN PRODUCTION : On fait la vérification complète
-          console.log("🌍 Mode PRODUCTION détecté");
-          
-          // Vérifier si l'utilisateur est connecté via Supabase
-          console.log("🔍 Vérification de l'utilisateur Supabase...");
-          const { data: { user }, error: userError } = await supabase.auth.getUser();
-          
-          // Si erreur OU pas de user → affiche formulaire de connexion (pas d'erreur)
-          if (userError || !user) {
-            console.log("⚠️ Utilisateur non connecté, affichage formulaire connexion DIRECT...");
-            setShowLoginForm(true);
-            setIsLoading(false);
-            return;
-          }
-          
-          console.log("✅ Utilisateur connecté:", user.email);
-          
-          // Vérifier si l'utilisateur est admin dans la BDD
-          console.log("🔍 Vérification du statut admin...");
-          const { data: profile, error: profileError } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single();
-          
-          if (profileError || !profile?.is_admin) {
-            console.log("⚠️ Utilisateur pas admin, déconnexion...");
-            await supabase.auth.signOut();
-            setShowLoginForm(true);
-            setIsLoading(false);
-            return;
-          }
-          
-          console.log("✅ Utilisateur est admin !");
-          setIsAdmin(true);
-          
-          // Vérifier si on a déjà entré le mot de passe admin
-          const savedAuth = sessionStorage.getItem('adminAuthenticated');
-          if (savedAuth === 'true') {
-            setIsAuthenticated(true);
-            await Promise.all([
-              fetchMovies(),
-              fetchRequests(),
-              fetchSagas(),
-              fetchUsers(),
-              fetchStreams(),
-              fetchStreamLogs(),
-              fetchSeries(),
-              fetchMaintenanceMode(),
-              fetchContactMessages(),
-              fetchDownloads(),
-              fetchBanners()
-            ]);
-          }
+          // EN PRODUCTION : On affiche d'abord le formulaire de connexion, pas d'erreur !
+          console.log("🌍 Mode PRODUCTION détecté, affichage formulaire connexion...");
+          setShowLoginForm(true);
           setIsLoading(false);
         }
       } catch (err) {
