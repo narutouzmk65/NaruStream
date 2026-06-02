@@ -86,39 +86,49 @@ export default function Home() {
     }
 
     const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-      
-      if (user) {
-        try {
-          const { data: notifData, error } = await supabase
-            .from('notifications')
-            .select('*')
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: false });
-          if (!error) {
-            setNotifications(notifData || []);
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        setUser(user);
+        
+        if (user) {
+          try {
+            const { data: notifData, error } = await supabase
+              .from('notifications')
+              .select('*')
+              .eq('user_id', user.id)
+              .order('created_at', { ascending: false });
+            if (!error) {
+              setNotifications(notifData || []);
+            }
+          } catch (e) {
+            // Ignore if notifications table doesn't exist
           }
-        } catch (e) {
-          // Ignore if notifications table doesn't exist
         }
+      } catch (e) {
+        console.warn("Erreur checkUser:", e);
       }
     };
     checkUser();
 
-    const fetchMovies = async () => {
-      console.log("🔍 Début fetchMovies...");
+    const fetchData = async () => {
+      console.log("🔍 Début fetchData...");
       try {
-        const { data, error } = await supabase
-          .from('movies')
-          .select('*')
-          .order('created_at', { ascending: false });
+        const [moviesResult, sagasResult] = await Promise.all([
+          supabase.from('movies').select('*').order('created_at', { ascending: false }),
+          supabase.from('sagas').select('*, saga_movies(*, movies(*))').order('created_at', { ascending: false })
+        ]);
 
-        if (error) {
-          console.warn('⚠️ Erreur Supabase :', error);
-        } else if (data && data.length > 0) {
-          console.log("✅ Films récupérés depuis Supabase !", data.length, "films");
-          setMovies(data);
+        if (!moviesResult.error && moviesResult.data) {
+          console.log("✅ Films récupérés depuis Supabase !", moviesResult.data.length, "films");
+          setMovies(moviesResult.data);
+        } else if (moviesResult.error) {
+          console.warn('⚠️ Erreur films :', moviesResult.error);
+        }
+
+        if (!sagasResult.error && sagasResult.data) {
+          setSagas(sagasResult.data);
+        } else if (sagasResult.error) {
+          console.error('⚠️ Erreur sagas :', sagasResult.error);
         }
       } catch (e) {
         console.warn("⚠️ Erreur générale :", e);
@@ -127,21 +137,7 @@ export default function Home() {
       }
     };
 
-    const fetchSagas = async () => {
-      const { data, error } = await supabase
-        .from('sagas')
-        .select('*, saga_movies(*, movies(*))')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching sagas:', error);
-      } else {
-        setSagas(data || []);
-      }
-    };
-
-    fetchMovies();
-    fetchSagas();
+    fetchData();
   }, []);
 
   // Générer le greeting seulement après le mount (pour éviter hydration error)
