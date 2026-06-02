@@ -17,6 +17,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="fr" className={`${inter.variable} ${orbitron.variable}`}>
       <head>
+        <title>Admin NaruStream - Version 2</title>
         <link rel="icon" href="/favicon.svg" />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
