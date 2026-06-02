@@ -280,6 +280,7 @@ export default function Home() {
           {/* Boutons desktop seulement */}
           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
             <Link href="/" className={`${styles.navLink} ${styles.desktopOnly}`}>Accueil</Link>
+            <Link href="/collections" className={`${styles.navLink} ${styles.desktopOnly}`}>Collections</Link>
             <Link href="/ma-liste" className={`${styles.navLink} ${styles.desktopOnly}`}>Ma Liste</Link>
             
             {/* Genre Dropdown */}
@@ -469,11 +470,12 @@ export default function Home() {
                     <div style={{ 
                       position: 'absolute', 
                       top: '0.75rem', 
-                      left: '0.75rem', 
+                      right: '0.75rem', 
                       display: 'flex', 
                       gap: '0.4rem', 
                       flexWrap: 'wrap',
-                      maxWidth: 'calc(100% - 1.5rem)'
+                      maxWidth: 'calc(100% - 1.5rem)',
+                      justifyContent: 'flex-end'
                     }}>
                       {movie.status && (
                         <span style={{
@@ -506,22 +508,6 @@ export default function Home() {
                           {movie.age_rating}
                         </span>
                       )}
-                      {movie.platform && (
-                        <span style={{
-                          background: 'linear-gradient(135deg, #a855f7, #7c3aed)',
-                          color: 'white',
-                          padding: '0.3rem 0.6rem',
-                          borderRadius: '6px',
-                          fontSize: '0.65rem',
-                          fontWeight: '700',
-                          textShadow: '0 1px 3px rgba(0,0,0,0.4)',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.5px',
-                          boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
-                        }}>
-                          {movie.platform}
-                        </span>
-                      )}
                     </div>
                     {/* Watch Now Button Overlay */}
                     <div className={styles.watchOverlay}>
@@ -530,7 +516,22 @@ export default function Home() {
                   </div>
                   <div className={styles.movieInfo}>
                     <h4 className={styles.movieTitle}>{movie.title}</h4>
-                    <span className={styles.movieMeta}>HD</span>
+                    {movie.platform && (
+                      <span style={{
+                        background: 'linear-gradient(135deg, #E50914, #B20710)',
+                        color: 'white',
+                        padding: '0.3rem 0.75rem',
+                        borderRadius: '6px',
+                        fontSize: '0.7rem',
+                        fontWeight: '700',
+                        textShadow: '0 1px 3px rgba(0,0,0,0.4)',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px',
+                        boxShadow: '0 2px 8px rgba(229, 9, 20, 0.3)'
+                      }}>
+                        {movie.platform}
+                      </span>
+                    )}
                   </div>
                 </Link>
               ))
@@ -746,7 +747,14 @@ export default function Home() {
             
             return (
               <section key={saga.id}>
-                <h3 className={styles.sectionTitle}>🍿 {saga.name}</h3>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', paddingRight: '2rem' }}>
+                  <h3 className={styles.sectionTitle} style={{ marginBottom: 0 }}>
+                    <Link href={`/saga/${saga.id}`} style={{ color: 'white', textDecoration: 'none' }}>🍿 {saga.name}</Link>
+                  </h3>
+                  <Link href={`/saga/${saga.id}`} style={{ color: 'var(--neon-blue)', fontSize: '0.9rem', textDecoration: 'none' }}>
+                    Voir tout ›
+                  </Link>
+                </div>
                 <div className={styles.carouselContainer}>
                   <button className={`${styles.carouselArrow} ${styles.left}`} onClick={() => scrollCarousel(saga.id, -1)}>
                     ‹
