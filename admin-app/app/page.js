@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import styles from './admin.module.css';
 import { supabase } from '@/lib/supabase';
 
-const ADMIN_PASSWORD = "8922513A4C38ADA3DD4703613838DAD1D7D2D4A2DB243F40240EC80F21543D4A";
+const ADMIN_PASSWORD = "admin123";
 
 // Liste des genres disponibles
 const GENRES = [
@@ -135,6 +135,8 @@ export default function AdminDashboard() {
     setIsImporting(false);
   }, []);
 
+  const [errorMessage, setErrorMessage] = useState('');
+  
   // Vérifier l'authentification et le statut admin
   useEffect(() => {
     const init = async () => {
@@ -143,41 +145,72 @@ export default function AdminDashboard() {
       
       setIsLoading(true);
       
-      // Vérifier si l'utilisateur est connecté via Supabase
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        window.location.href = 'https://narustream-omega.vercel.app/login';
-        return;
-      }
-      
-      // Vérifier si l'utilisateur est admin dans la BDD
-      const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single();
-      if (!profile?.is_admin) {
-        window.location.href = 'https://narustream-omega.vercel.app/';
-        return;
-      }
-      setIsAdmin(true);
-      
-      // Vérifier si on a déjà entré le mot de passe (sessionStorage seulement)
-      const savedAuth = sessionStorage.getItem('adminAuthenticated');
-      if (savedAuth === 'true') {
-        setIsAuthenticated(true);
-        // Load all data
-        await Promise.all([
-          fetchMovies(),
-          fetchRequests(),
-          fetchSagas(),
-          fetchUsers(),
-          fetchStreams(),
-          fetchStreamLogs(),
-          fetchSeries(),
-          fetchMaintenanceMode(),
-          fetchContactMessages(),
-          fetchDownloads(),
-          fetchBanners()
-        ]);
-      } else {
-        setIsAuthenticated(false);
+      try {
+        // Détecter si on est en développement local
+        const isLocal = window.location.hostname === 'localhost';
+        const mainSiteUrl = isLocal ? 'http://localhost:3000' : 'https://narustream-omega.vercel.app';
+        
+        // Vérifier si l'utilisateur est connecté via Supabase
+        console.log("🔍 Vérification de l'utilisateur Supabase...");
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        if (userError) {
+          console.error("❌ Erreur Supabase auth:", userError);
+          setErrorMessage("Erreur auth: " + userError.message);
+          setIsLoading(false);
+          return;
+        }
+        if (!user) {
+          console.log("⚠️ Utilisateur non connecté, redirection vers login...");
+          window.location.href = `${mainSiteUrl}/login`;
+          return;
+        }
+        console.log("✅ Utilisateur connecté:", user.email);
+        
+        // Vérifier si l'utilisateur est admin dans la BDD
+        console.log("🔍 Vérification du statut admin...");
+        const { data: profile, error: profileError } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single();
+        if (profileError) {
+          console.error("❌ Erreur profil:", profileError);
+          setErrorMessage("Erreur profil: " + profileError.message);
+          setIsLoading(false);
+          return;
+        }
+        console.log("📋 Profil trouvé:", profile);
+        if (!profile?.is_admin) {
+          console.log("⚠️ Utilisateur pas admin, redirection vers accueil...");
+          window.location.href = mainSiteUrl;
+          return;
+        }
+        console.log("✅ Utilisateur est admin !");
+        setIsAdmin(true);
+        
+        // Vérifier si on a déjà entré le mot de passe (sessionStorage seulement)
+        const savedAuth = sessionStorage.getItem('adminAuthenticated');
+        if (savedAuth === 'true') {
+          console.log("✅ Mot de passe déjà entré, chargement des données...");
+          setIsAuthenticated(true);
+          // Load all data
+          await Promise.all([
+            fetchMovies(),
+            fetchRequests(),
+            fetchSagas(),
+            fetchUsers(),
+            fetchStreams(),
+            fetchStreamLogs(),
+            fetchSeries(),
+            fetchMaintenanceMode(),
+            fetchContactMessages(),
+            fetchDownloads(),
+            fetchBanners()
+          ]);
+        } else {
+          console.log("🔐 Besoin du mot de passe admin");
+          setIsAuthenticated(false);
+        }
+        
+      } catch (err) {
+        console.error("💥 Erreur inattendue:", err);
+        setErrorMessage("Erreur inattendue: " + err.message);
       }
       
       setIsLoading(false);
@@ -1137,6 +1170,27 @@ export default function AdminDashboard() {
     setIsAuthenticated(false);
   };
 
+  if (errorMessage) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'var(--bg-color)',
+        color: 'white',
+        fontSize: '1.2rem',
+        padding: '2rem',
+        textAlign: 'center'
+      }}>
+        <h1 style={{ color: '#ff3232', marginBottom: '1rem' }}>❌ ERREUR</h1>
+        <p style={{ maxWidth: '600px', lineHeight: '1.6' }}>{errorMessage}</p>
+        <p style={{ marginTop: '2rem', color: '#aaa' }}>Ouvre la console (F12) pour plus d'infos</p>
+      </div>
+    );
+  }
+  
   if (isLoading) {
     return (
       <div style={{
