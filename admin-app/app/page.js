@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import styles from './admin.module.css';
 import { supabase } from '@/lib/supabase';
 
-const ADMIN_PASSWORD = "8922513A4C38ADA3DD4703613838DAD1D7D2D4A2DB243F40240EC80F21543D4A";
+const ADMIN_PASSWORD_HASH = "01d03a4b04957264b3e8c0825d4eaaa7f60b79ff98f2ab6b8806821d36e9aa6f";
 
 // Liste des genres disponibles
 const GENRES = [
@@ -1166,25 +1166,36 @@ export default function AdminDashboard() {
 
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
-    if (passwordInput === ADMIN_PASSWORD) {
-      sessionStorage.setItem('adminAuthenticated', 'true');
-      setIsAuthenticated(true);
-      // Load all data now that we're authenticated
-      await Promise.all([
-        fetchMovies(),
-        fetchRequests(),
-        fetchSagas(),
-        fetchUsers(),
-        fetchStreams(),
-        fetchStreamLogs(),
-        fetchSeries(),
-        fetchMaintenanceMode(),
-        fetchContactMessages(),
-        fetchDownloads(),
-        fetchBanners()
-      ]);
-    } else {
-      alert('Mot de passe incorrect !');
+    try {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(passwordInput);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+      if (hashHex === ADMIN_PASSWORD_HASH) {
+        sessionStorage.setItem('adminAuthenticated', 'true');
+        setIsAuthenticated(true);
+        // Load all data now that we're authenticated
+        await Promise.all([
+          fetchMovies(),
+          fetchRequests(),
+          fetchSagas(),
+          fetchUsers(),
+          fetchStreams(),
+          fetchStreamLogs(),
+          fetchSeries(),
+          fetchMaintenanceMode(),
+          fetchContactMessages(),
+          fetchDownloads(),
+          fetchBanners()
+        ]);
+      } else {
+        alert('Mot de passe incorrect !');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Erreur lors de la vérification du mot de passe');
     }
   };
   
