@@ -1169,15 +1169,24 @@ export default function AdminDashboard() {
           borderRadius: '12px',
           border: '1px solid var(--neon-blue)',
           boxShadow: '0 0 30px rgba(0, 255, 255, 0.2)',
-          maxWidth: '400px',
+          maxWidth: '500px',
           width: '100%',
           textAlign: 'center'
         }}>
-          <h1 className="text-glow-blue" style={{ marginBottom: '2rem', fontSize: '2rem' }}>🔒 Accès Admin</h1>
+          <h1 className="text-glow-blue" style={{ marginBottom: '1rem', fontSize: '2rem' }}>🔒 Accès Admin</h1>
+          
+          <div style={{ marginBottom: '2rem', textAlign: 'left', color: '#aaa', lineHeight: '1.6' }}>
+            <p style={{ marginBottom: '0.5rem' }}>⚠️ Avant de continuer :</p>
+            <ul style={{ paddingLeft: '1.5rem' }}>
+              <li>Tu dois être connecté sur le site principal (https://narustream-omega.vercel.app</li>
+              <li>Tu dois avoir un profil admin dans la base de données</li>
+            </ul>
+          </div>
+          
           <form onSubmit={handlePasswordSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <input
               type="password"
-              placeholder="Entrez le mot de passe"
+              placeholder="Entrez le mot de passe admin"
               value={passwordInput}
               onChange={(e) => setPasswordInput(e.target.value)}
               style={{
