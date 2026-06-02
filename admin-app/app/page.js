@@ -136,6 +136,74 @@ export default function AdminDashboard() {
   }, []);
 
   const [errorMessage, setErrorMessage] = useState('');
+  const [showLoginForm, setShowLoginForm] = useState(false);
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  
+  const handleDirectLogin = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setErrorMessage('');
+    
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: loginEmail,
+        password: loginPassword
+      });
+      
+      if (error) {
+        setErrorMessage("Erreur connexion: " + error.message);
+        setIsLoading(false);
+        return;
+      }
+      
+      setShowLoginForm(false);
+      // Maintenant on refait l'initialisation
+      const initAfterLogin = async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          setErrorMessage("Utilisateur non trouvé après connexion");
+          setIsLoading(false);
+          return;
+        }
+        
+        const { data: profile, error: profileError } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single();
+        if (profileError || !profile?.is_admin) {
+          await supabase.auth.signOut();
+          setErrorMessage("Ce compte n'est pas admin !");
+          setIsLoading(false);
+          return;
+        }
+        
+        setIsAdmin(true);
+        
+        const savedAuth = sessionStorage.getItem('adminAuthenticated');
+        if (savedAuth === 'true') {
+          setIsAuthenticated(true);
+          await Promise.all([
+            fetchMovies(),
+            fetchRequests(),
+            fetchSagas(),
+            fetchUsers(),
+            fetchStreams(),
+            fetchStreamLogs(),
+            fetchSeries(),
+            fetchMaintenanceMode(),
+            fetchContactMessages(),
+            fetchDownloads(),
+            fetchBanners()
+          ]);
+        }
+        setIsLoading(false);
+      };
+      
+      await initAfterLogin();
+      
+    } catch (err) {
+      setErrorMessage("Erreur: " + err.message);
+      setIsLoading(false);
+    }
+  };
   
   // Vérifier l'authentification et le statut admin
   useEffect(() => {
@@ -168,8 +236,9 @@ export default function AdminDashboard() {
             return;
           }
           if (!user) {
-            console.log("⚠️ Utilisateur non connecté, redirection vers login...");
-            window.location.href = `${mainSiteUrl}/login`;
+            console.log("⚠️ Utilisateur non connecté, affichage formulaire connexion DIRECT...");
+            setShowLoginForm(true);
+            setIsLoading(false);
             return;
           }
           console.log("✅ Utilisateur connecté:", user.email);
@@ -185,8 +254,10 @@ export default function AdminDashboard() {
           }
           console.log("📋 Profil trouvé:", profile);
           if (!profile?.is_admin) {
-            console.log("⚠️ Utilisateur pas admin, redirection vers accueil...");
-            window.location.href = mainSiteUrl;
+            console.log("⚠️ Utilisateur pas admin, déconnexion...");
+            await supabase.auth.signOut();
+            setShowLoginForm(true);
+            setIsLoading(false);
             return;
           }
           console.log("✅ Utilisateur est admin !");
@@ -1212,6 +1283,76 @@ export default function AdminDashboard() {
         fontSize: '1.5rem'
       }}>
         Chargement...
+      </div>
+    );
+  }
+
+  if (showLoginForm) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'var(--bg-color)',
+        padding: '2rem'
+      }}>
+        <div style={{
+          background: 'rgba(30, 30, 50, 0.95)',
+          padding: '3rem',
+          borderRadius: '12px',
+          border: '1px solid var(--neon-blue)',
+          boxShadow: '0 0 30px rgba(0, 255, 255, 0.2)',
+          maxWidth: '450px',
+          width: '100%',
+          textAlign: 'center'
+        }}>
+          <h1 className="text-glow-blue" style={{ marginBottom: '2rem', fontSize: '1.8rem' }}>🔐 Connexion Admin</h1>
+          <form onSubmit={handleDirectLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <input
+              type="email"
+              placeholder="Email"
+              value={loginEmail}
+              onChange={(e) => setLoginEmail(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '1rem',
+                fontSize: '1.1rem',
+                background: 'rgba(0,0,0,0.3)',
+                border: '1px solid var(--neon-pink)',
+                borderRadius: '8px',
+                color: 'white',
+                outline: 'none'
+              }}
+              autoFocus
+              required
+            />
+            <input
+              type="password"
+              placeholder="Mot de passe"
+              value={loginPassword}
+              onChange={(e) => setLoginPassword(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '1rem',
+                fontSize: '1.1rem',
+                background: 'rgba(0,0,0,0.3)',
+                border: '1px solid var(--neon-pink)',
+                borderRadius: '8px',
+                color: 'white',
+                outline: 'none'
+              }}
+              required
+            />
+            <button
+              type="submit"
+              className="cyber-button primary"
+              style={{ width: '100%', padding: '1rem', fontSize: '1.2rem' }}
+            >
+              Se connecter
+            </button>
+          </form>
+        </div>
       </div>
     );
   }
