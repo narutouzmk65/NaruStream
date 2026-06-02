@@ -239,7 +239,8 @@ export default function AdminDashboard() {
     init();
   }, []);
 
-    // Synchronisation temps réel avec Supabase pour le mode maintenance
+  // Synchronisation temps réel avec Supabase pour le mode maintenance
+  useEffect(() => {
     let subscription;
     try {
       subscription = supabase
@@ -256,7 +257,7 @@ export default function AdminDashboard() {
     return () => {
       if (subscription) subscription.unsubscribe();
     };
-  }, [router]);
+  }, []);
 
   const fetchMaintenanceMode = async () => {
     // D'abord charger depuis localStorage pour instantané
