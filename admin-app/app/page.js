@@ -216,12 +216,32 @@ export default function AdminDashboard() {
       try {
         // Détecter si on est en développement local
         const isLocal = window.location.hostname === 'localhost';
-        const mainSiteUrl = isLocal ? 'http://localhost:3000' : 'https://narustream-omega.vercel.app';
         
         if (isLocal) {
           // EN LOCAL : On saute la vérification de session (car ports différents), on demande juste le mot de passe !
           console.log("🏠 Mode LOCAL détecté, vérification admin simplifiée");
           setIsAdmin(true);
+          setIsLoading(false);
+          
+          // Vérifier si on a déjà entré le mot de passe pour charger les données
+          const savedAuth = sessionStorage.getItem('adminAuthenticated');
+          if (savedAuth === 'true') {
+            console.log("✅ Mot de passe déjà entré, chargement des données...");
+            setIsAuthenticated(true);
+            await Promise.all([
+              fetchMovies(),
+              fetchRequests(),
+              fetchSagas(),
+              fetchUsers(),
+              fetchStreams(),
+              fetchStreamLogs(),
+              fetchSeries(),
+              fetchMaintenanceMode(),
+              fetchContactMessages(),
+              fetchDownloads(),
+              fetchBanners()
+            ]);
+          }
         } else {
           // EN PRODUCTION : On fait la vérification complète
           console.log("🌍 Mode PRODUCTION détecté");
@@ -229,73 +249,61 @@ export default function AdminDashboard() {
           // Vérifier si l'utilisateur est connecté via Supabase
           console.log("🔍 Vérification de l'utilisateur Supabase...");
           const { data: { user }, error: userError } = await supabase.auth.getUser();
-          if (userError) {
-            console.error("❌ Erreur Supabase auth:", userError);
-            setErrorMessage("Erreur auth: " + userError.message);
-            setIsLoading(false);
-            return;
-          }
-          if (!user) {
+          
+          // Si erreur OU pas de user → affiche formulaire de connexion (pas d'erreur)
+          if (userError || !user) {
             console.log("⚠️ Utilisateur non connecté, affichage formulaire connexion DIRECT...");
             setShowLoginForm(true);
             setIsLoading(false);
             return;
           }
+          
           console.log("✅ Utilisateur connecté:", user.email);
           
           // Vérifier si l'utilisateur est admin dans la BDD
           console.log("🔍 Vérification du statut admin...");
           const { data: profile, error: profileError } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single();
-          if (profileError) {
-            console.error("❌ Erreur profil:", profileError);
-            setErrorMessage("Erreur profil: " + profileError.message);
-            setIsLoading(false);
-            return;
-          }
-          console.log("📋 Profil trouvé:", profile);
-          if (!profile?.is_admin) {
+          
+          if (profileError || !profile?.is_admin) {
             console.log("⚠️ Utilisateur pas admin, déconnexion...");
             await supabase.auth.signOut();
             setShowLoginForm(true);
             setIsLoading(false);
             return;
           }
+          
           console.log("✅ Utilisateur est admin !");
           setIsAdmin(true);
+          
+          // Vérifier si on a déjà entré le mot de passe admin
+          const savedAuth = sessionStorage.getItem('adminAuthenticated');
+          if (savedAuth === 'true') {
+            setIsAuthenticated(true);
+            await Promise.all([
+              fetchMovies(),
+              fetchRequests(),
+              fetchSagas(),
+              fetchUsers(),
+              fetchStreams(),
+              fetchStreamLogs(),
+              fetchSeries(),
+              fetchMaintenanceMode(),
+              fetchContactMessages(),
+              fetchDownloads(),
+              fetchBanners()
+            ]);
+          }
+          setIsLoading(false);
         }
-        
-        // Vérifier si on a déjà entré le mot de passe (sessionStorage seulement)
-        const savedAuth = sessionStorage.getItem('adminAuthenticated');
-        if (savedAuth === 'true') {
-          console.log("✅ Mot de passe déjà entré, chargement des données...");
-          setIsAuthenticated(true);
-          // Load all data
-          await Promise.all([
-            fetchMovies(),
-            fetchRequests(),
-            fetchSagas(),
-            fetchUsers(),
-            fetchStreams(),
-            fetchStreamLogs(),
-            fetchSeries(),
-            fetchMaintenanceMode(),
-            fetchContactMessages(),
-            fetchDownloads(),
-            fetchBanners()
-          ]);
-        } else {
-          console.log("🔐 Besoin du mot de passe admin");
-          setIsAuthenticated(false);
-        }
-        
       } catch (err) {
-        console.error("💥 Erreur inattendue:", err);
-        setErrorMessage("Erreur inattendue: " + err.message);
+        console.error("Erreur init:", err);
+        // En cas d'erreur, on affiche le formulaire de connexion
+        setShowLoginForm(true);
+        setIsLoading(false);
       }
-      
-      setIsLoading(false);
     };
     init();
+  }, []);
 
     // Synchronisation temps réel avec Supabase pour le mode maintenance
     let subscription;
