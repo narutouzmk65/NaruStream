@@ -229,9 +229,9 @@ export default function EpisodeDetail() {
 
       {/* Player Section */}
       <div className={styles.playerSection}>
-        {activeStream && activeStream.m3u8_url ? (
+        {activeStream && (activeStream.m3u8_url || (activeStream.server_name && activeStream.server_name.toLowerCase().includes('premium'))) ? (
           <div>
-            <NarutostreamPlayer src={activeStream.m3u8_url} poster={episode.poster_url || series.poster_url} />
+            <NarutostreamPlayer src={activeStream.m3u8_url || activeStream.player_url} poster={episode.poster_url || series.poster_url} />
             <div className={styles.serverSelector}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
                 <h3 className="text-glow-accent">Serveurs Disponibles</h3>

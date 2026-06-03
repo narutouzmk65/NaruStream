@@ -56,6 +56,22 @@ export default function RootLayout({ children }) {
   useEffect(() => {
     clearBrowserCache();
     router.refresh();
+
+    // App resume / focus refresh logic for mobile and windows apps
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        clearBrowserCache();
+        router.refresh();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleVisibilityChange);
+    };
   }, [router]);
 
   // Rotate title every 25 seconds

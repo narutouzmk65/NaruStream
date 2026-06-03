@@ -6,9 +6,8 @@ import styles from "./HeroCarousel.module.css";
 import { supabase } from "@/lib/supabase";
 
 export default function HeroCarousel({ movies }) {
-  // Use useMemo for fallback banners (no state needed for fallback)
-  const fallbackBanners = useMemo(() => {
-    return movies.map(movie => ({
+  const banners = useMemo(() => {
+    return movies.slice(0, 15).map(movie => ({
       id: movie.id,
       title: movie.title,
       description: movie.description,
@@ -17,33 +16,8 @@ export default function HeroCarousel({ movies }) {
     }));
   }, [movies]);
 
-  const [dbBanners, setDbBanners] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
-
-  // Determine which banners to use
-  const banners = dbBanners && dbBanners.length > 0 ? dbBanners : fallbackBanners;
-
-  // Charger les bannières depuis la BDD
-  useEffect(() => {
-    const fetchBanners = async () => {
-      try {
-        const { data, error } = await supabase
-          .from("banners")
-          .select("*")
-          .eq("is_active", true)
-          .order("display_order", { ascending: true });
-          
-        if (!error && data && data.length > 0) {
-          setDbBanners(data);
-        }
-      } catch (e) {
-        console.error("Erreur chargement bannières:", e);
-      }
-    };
-    
-    fetchBanners();
-  }, []);
 
   const nextSlide = useCallback(() => {
     if (isTransitioning || banners.length === 0) return;

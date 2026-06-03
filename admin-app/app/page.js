@@ -92,7 +92,7 @@ export default function AdminDashboard() {
   const [newSeriesPoster, setNewSeriesPoster] = useState('');
   const [newSeriesTrailer, setNewSeriesTrailer] = useState('');
   const [newSeriesYear, setNewSeriesYear] = useState('');
-  const [newSeriesCategory, setNewSeriesCategory] = useState('');
+  const [newSeriesCategory, setNewSeriesCategory] = useState([]);
   const [newSeriesAgeRating, setNewSeriesAgeRating] = useState('10+');
   const [newSeriesPlatform, setNewSeriesPlatform] = useState('');
   const [newSeriesStatus, setNewSeriesStatus] = useState('sortie');
@@ -432,15 +432,26 @@ export default function AdminDashboard() {
 
   const sendNotificationToAll = async (title, message) => {
     try {
-      if (users.length > 0) {
-        const notifications = users.map(user => ({
-          user_id: user.id,
-          title: title,
-          message: message,
-          is_read: false
-        }));
-        await supabase.from('notifications').insert(notifications);
-        console.log(`Notifications sent to ${users.length} users!`);
+      const { error } = await supabase.rpc('send_notification_to_all_users', {
+        p_title: title,
+        p_message: message
+      });
+      if (error) {
+        console.error("Failed to send notifications via RPC", error);
+        
+        // Fallback (au cas où la fonction RPC n'est pas encore créée)
+        if (users.length > 0) {
+          const notifications = users.map(user => ({
+            user_id: user.id,
+            title: title,
+            message: message,
+            is_read: false
+          }));
+          await supabase.from('notifications').insert(notifications);
+          console.log(`Fallback: Notifications sent to ${users.length} users!`);
+        }
+      } else {
+        console.log(`Notifications sent via RPC successfully!`);
       }
     } catch (e) {
       console.error("Failed to send notifications", e);
@@ -543,7 +554,7 @@ export default function AdminDashboard() {
           poster_url: newSeriesPoster,
           trailer_url: newSeriesTrailer,
           release_year: newSeriesYear,
-          category: newSeriesCategory,
+          category: Array.isArray(newSeriesCategory) ? newSeriesCategory.join(', ') : newSeriesCategory,
           content_type: 'serie',
           age_rating: newSeriesAgeRating,
           platform: newSeriesPlatform || null,
@@ -569,7 +580,7 @@ export default function AdminDashboard() {
         setNewSeriesPoster('');
         setNewSeriesTrailer('');
         setNewSeriesYear('');
-        setNewSeriesCategory('');
+        setNewSeriesCategory([]);
         setNewSeriesAgeRating('10+');
         setNewSeriesPlatform('');
         fetchMovies();
@@ -1654,7 +1665,7 @@ export default function AdminDashboard() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                   <div className={styles.formGroup}>
                     <label>Nom du Serveur</label>
-                    <input type="text" className={styles.cyberInput} value={addServerName} onChange={(e) => setAddServerName(e.target.value)} placeholder="Ex: Lecteur Secours" />
+                    <input type="text" className={styles.cyberInput} value={addServerName} onChange={(e) => setAddServerName(e.target.value)} placeholder="Ex: Lecteur Premium" />
                   </div>
                   <div className={styles.formGroup}>
                     <label>Qualité</label>
@@ -1722,18 +1733,26 @@ export default function AdminDashboard() {
                   <input type="text" className={styles.cyberInput} value={newSeriesTrailer} onChange={(e) => setNewSeriesTrailer(e.target.value)} placeholder="https://www.youtube.com/embed/..." />
                 </div>
               </div>
-              <div className={styles.formGroup}>
-                <label>Catégorie</label>
-                <select 
-                  className={styles.cyberInput}
-                  value={newSeriesCategory}
-                  onChange={(e) => setNewSeriesCategory(e.target.value)}
-                >
-                  <option value="">Sélectionner une catégorie</option>
+              <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+                <label>Catégories</label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '5px' }}>
                   {GENRES.map(genre => (
-                    <option key={genre} value={genre}>{genre}</option>
+                    <label key={genre} style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(255,255,255,0.05)', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer', userSelect: 'none' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={Array.isArray(newSeriesCategory) && newSeriesCategory.includes(genre)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setNewSeriesCategory([...(Array.isArray(newSeriesCategory) ? newSeriesCategory : []), genre]);
+                          } else {
+                            setNewSeriesCategory((Array.isArray(newSeriesCategory) ? newSeriesCategory : []).filter(g => g !== genre));
+                          }
+                        }}
+                      />
+                      {genre}
+                    </label>
                   ))}
-                </select>
+                </div>
               </div>
               <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem'}}>
                 <div className={styles.formGroup}>
@@ -1911,7 +1930,7 @@ export default function AdminDashboard() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 <div className={styles.formGroup}>
                   <label>Nom du Serveur</label>
-                  <input type="text" className={styles.cyberInput} value={backupServerName} onChange={(e) => setBackupServerName(e.target.value)} placeholder="Ex: Serveur Secours" />
+                  <input type="text" className={styles.cyberInput} value={backupServerName} onChange={(e) => setBackupServerName(e.target.value)} placeholder="Ex: Lecteur Premium" />
                 </div>
                 <div className={styles.formGroup}>
                   <label>Qualité</label>

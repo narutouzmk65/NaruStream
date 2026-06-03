@@ -119,8 +119,9 @@
   overflow: hidden;
   aspect-ratio: 2/3;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   background: #141414;
+  will-change: transform;
 }
 
 .movieCard:hover {
@@ -132,6 +133,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: top center;
 }
 
 .movieInfo {
@@ -208,6 +210,8 @@
   padding: 0.5rem 0;
   scroll-behavior: smooth;
   scrollbar-width: none; /* Firefox */
+  will-change: scroll-position;
+  -webkit-overflow-scrolling: touch;
 }
 
 .carouselArrow {

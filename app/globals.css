@@ -11,6 +11,10 @@
   --glass-highlight: rgba(255, 255, 255, 0.08);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 * {
   box-sizing: border-box;
   padding: 0;

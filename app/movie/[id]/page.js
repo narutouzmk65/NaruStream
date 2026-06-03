@@ -513,7 +513,12 @@ export default function MovieDetail() {
                 <span className="text-glow-primary">NARU.STREAM SECURE PLAYER</span>
                 <span className={styles.qualityBadge}>{activeStream?.quality || "PREMIUM"}</span>
               </div>
-              {activeStream && activeStream.player_url ? (
+              {activeStream && (activeStream.m3u8_url || (activeStream.server_name && activeStream.server_name.toLowerCase().includes('premium'))) ? (
+                <NarutostreamPlayer
+                  src={activeStream.m3u8_url || activeStream.player_url}
+                  poster={movie.backdrop_url || movie.poster_url}
+                />
+              ) : activeStream && activeStream.player_url ? (
                 <iframe
                   src={activeStream.player_url}
                   className={styles.iframePlayer}
