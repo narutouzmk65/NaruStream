@@ -1,14 +1,28 @@
+/* =========================================
+   NARUSTREAM PREMIUM PLAYER
+   Inspired by Netflix & Disney+ design
+   ========================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 .playerContainer {
   position: relative;
   width: 100%;
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
   background: #000;
-  border-radius: 16px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 195, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  font-family: var(--font-inter), sans-serif;
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.9),
+    0 0 0 1px rgba(255, 255, 255, 0.06);
+  font-family: 'Inter', sans-serif;
+  user-select: none;
+  cursor: none;
+}
+
+.playerContainer.controlsVisible {
+  cursor: default;
 }
 
 .video {
@@ -20,51 +34,95 @@
   object-fit: contain;
 }
 
+/* ---- GRADIENT OVERLAY ---- */
 .controlsOverlay {
   position: absolute;
   inset: 0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 24px;
   opacity: 0;
-  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.7) 0%,
-    rgba(0, 0, 0, 0) 20%,
-    rgba(0, 0, 0, 0) 60%,
-    rgba(0, 0, 0, 0.8) 100%
-  );
+  transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
   z-index: 10;
 }
 
 .controlsOverlay.visible {
   opacity: 1;
+  pointer-events: all;
 }
 
-/* Top bar for modern feel */
+/* Top gradient */
+.topGradient {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom, rgba(0,0,0,0.75) 0%, transparent 28%),
+    linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 35%);
+  pointer-events: none;
+}
+
+/* ---- TOP BAR ---- */
 .topBar {
+  position: relative;
+  z-index: 2;
   display: flex;
-  justify-content: flex-end;
   align-items: center;
-  width: 100%;
+  justify-content: space-between;
+  padding: 20px 24px 0;
 }
 
-.qualityBadge {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 12px;
+.contentTitle {
+  font-size: 18px;
   font-weight: 700;
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  letter-spacing: 1px;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+  letter-spacing: 0.3px;
+  max-width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* Central Controls */
+.contentTitle span {
+  color: rgba(255,255,255,0.55);
+  font-weight: 400;
+  font-size: 14px;
+  margin-left: 8px;
+}
+
+.topBadges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hdBadge {
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 5px;
+  padding: 4px 9px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+.premiumBadge {
+  background: linear-gradient(135deg, #e50914 0%, #b20710 100%);
+  border-radius: 5px;
+  padding: 4px 9px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.8px;
+  box-shadow: 0 2px 8px rgba(229,9,20,0.5);
+}
+
+/* ---- CENTER CONTROLS ---- */
 .centerControls {
   position: absolute;
   top: 50%;
@@ -72,228 +130,364 @@
   transform: translate(-50%, -50%);
   display: flex;
   align-items: center;
-  gap: 30px;
+  gap: 36px;
+  z-index: 2;
 }
 
-.centerBtn {
-  background: rgba(20, 20, 20, 0.5);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+.skipBtn {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1.5px solid rgba(255,255,255,0.2);
   border-radius: 50%;
-  width: 60px;
-  height: 60px;
+  width: 54px;
+  height: 54px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #fff;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  gap: 2px;
+}
+
+.skipBtn:hover {
+  background: rgba(255,255,255,0.22);
+  border-color: rgba(255,255,255,0.4);
+  transform: scale(1.12);
+  box-shadow: 0 0 20px rgba(255,255,255,0.15);
+}
+
+.skipLabel {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: rgba(255,255,255,0.9);
+  line-height: 1;
+}
+
+/* Main Play/Pause button - Netflix style */
+.playPauseBtn {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.95);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  color: white;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow:
+    0 0 0 8px rgba(255,255,255,0.12),
+    0 8px 32px rgba(0,0,0,0.6);
+  color: #000;
 }
 
-.centerBtn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: scale(1.15);
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+.playPauseBtn:hover {
+  background: #fff;
+  transform: scale(1.1);
+  box-shadow:
+    0 0 0 12px rgba(255,255,255,0.18),
+    0 12px 40px rgba(0,0,0,0.7);
 }
 
-.centerPlay {
-  width: 80px;
-  height: 80px;
-  background: rgba(0, 195, 255, 0.8);
-  border: none;
-  box-shadow: 0 0 30px rgba(0, 195, 255, 0.5);
+.playPauseBtn svg {
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
 }
 
-.centerPlay:hover {
-  background: rgba(0, 195, 255, 1);
-  transform: scale(1.15);
-  box-shadow: 0 0 40px rgba(0, 195, 255, 0.8);
+/* ---- BUFFERING SPINNER ---- */
+.spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 52px;
+  height: 52px;
+  border: 3px solid rgba(255,255,255,0.1);
+  border-top-color: #e50914;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  z-index: 3;
 }
 
-/* Bottom Controls Wrapper */
+@keyframes spin {
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* ---- BOTTOM CONTROLS ---- */
 .bottomControls {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  width: 100%;
+  gap: 0;
+  padding: 0 24px 20px;
 }
 
-/* Modern Progress Bar */
-.progressContainer {
+/* ---- PROGRESS BAR (Netflix style) ---- */
+.progressSection {
   display: flex;
   align-items: center;
-  gap: 12px;
-  width: 100%;
+  gap: 14px;
+  margin-bottom: 12px;
 }
 
 .timeText {
-  color: rgba(255, 255, 255, 0.9);
   font-size: 13px;
   font-weight: 500;
-  min-width: 45px;
+  color: rgba(255,255,255,0.9);
+  min-width: 42px;
   text-align: center;
   font-variant-numeric: tabular-nums;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+  letter-spacing: 0.3px;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
 }
 
-.progressBarWrapper {
-  position: relative;
+.progressWrapper {
   flex: 1;
-  height: 24px;
+  position: relative;
+  height: 28px;
   display: flex;
   align-items: center;
   cursor: pointer;
+  group: true;
 }
 
-.progressBarTrack {
+.progressTrack {
   position: absolute;
   width: 100%;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 2px;
+  height: 3px;
+  background: rgba(255,255,255,0.25);
+  border-radius: 999px;
+  overflow: visible;
   transition: height 0.2s ease;
-  overflow: hidden;
 }
 
-.progressBarFill {
+.progressWrapper:hover .progressTrack {
+  height: 5px;
+}
+
+.progressBuffered {
   position: absolute;
   height: 100%;
-  background: var(--neon-blue, #00f0ff);
-  border-radius: 2px;
-  box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+  background: rgba(255,255,255,0.35);
+  border-radius: 999px;
 }
 
-.progressBarWrapper:hover .progressBarTrack {
-  height: 6px;
+.progressFill {
+  position: absolute;
+  height: 100%;
+  background: #e50914; /* Netflix red */
+  border-radius: 999px;
+  transition: width 0.1s linear;
+  box-shadow: 0 0 8px rgba(229,9,20,0.4);
 }
 
-.progressBarThumb {
+.progressThumb {
   position: absolute;
   width: 14px;
   height: 14px;
   background: #fff;
   border-radius: 50%;
-  transform: translate(-50%, 0);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  transform: translateX(-50%);
+  top: 50%;
+  margin-top: -7px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
   opacity: 0;
-  transition: opacity 0.2s ease, transform 0.1s;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
 }
 
-.progressBarWrapper:hover .progressBarThumb {
+.progressWrapper:hover .progressThumb {
+  opacity: 1;
+  transform: translateX(-50%) scale(1.2);
+}
+
+/* Tooltip on progress bar */
+.progressTooltip {
+  position: absolute;
+  bottom: 20px;
+  transform: translateX(-50%);
+  background: rgba(20,20,20,0.9);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+.progressWrapper:hover .progressTooltip {
   opacity: 1;
 }
 
-.progressBar {
+.progressInput {
   position: absolute;
   width: 100%;
   height: 100%;
   opacity: 0;
   cursor: pointer;
-  z-index: 2;
   margin: 0;
+  z-index: 3;
 }
 
-/* Control Buttons Bar */
+/* ---- CONTROLS BAR ---- */
 .controlsBar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
 }
 
-.leftControls, .rightControls {
+.leftControls,
+.rightControls {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 4px;
 }
 
 .controlBtn {
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 6px;
+  padding: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  transition: all 0.2s ease;
+  color: rgba(255,255,255,0.88);
+  transition: all 0.18s ease;
   border-radius: 8px;
-  opacity: 0.85;
+  position: relative;
 }
 
 .controlBtn:hover {
-  background: rgba(255, 255, 255, 0.15);
-  opacity: 1;
-  transform: scale(1.1);
+  color: #fff;
+  background: rgba(255,255,255,0.1);
+  transform: scale(1.08);
 }
 
-/* Volume Control */
-.volumeContainer {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.controlBtn:active {
+  transform: scale(0.95);
 }
 
-.volumeSliderWrapper {
-  width: 0;
-  overflow: hidden;
-  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
+/* Tooltip on buttons */
+.controlBtn::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(20,20,20,0.95);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
   opacity: 0;
-  display: flex;
-  align-items: center;
+  transition: opacity 0.15s ease;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
 }
 
-.volumeContainer:hover .volumeSliderWrapper {
-  width: 80px;
+.controlBtn:hover::after {
   opacity: 1;
 }
 
-.volumeBar {
+/* Volume control - Disney+ style inline */
+.volumeGroup {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  overflow: hidden;
+  max-width: 36px;
+  transition: max-width 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+
+.volumeGroup:hover {
+  max-width: 140px;
+  gap: 6px;
+}
+
+.volumeSlider {
   -webkit-appearance: none;
-  width: 100%;
+  width: 80px;
   height: 4px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 2px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 999px;
   outline: none;
   cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  flex-shrink: 0;
 }
 
-.volumeBar::-webkit-slider-thumb {
+.volumeGroup:hover .volumeSlider {
+  opacity: 1;
+}
+
+.volumeSlider::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 12px;
-  height: 12px;
-  background: white;
+  width: 13px;
+  height: 13px;
+  background: #fff;
   border-radius: 50%;
   cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.5);
 }
 
-/* Mobile Responsiveness */
+.volumeSlider::-moz-range-thumb {
+  width: 13px;
+  height: 13px;
+  background: #fff;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+/* ---- FULLSCREEN ICON ---- */
+.fullscreenBtn {
+  margin-left: 4px;
+}
+
+/* ---- MOBILE ---- */
 @media (max-width: 768px) {
   .playerContainer {
     border-radius: 0;
   }
-  
-  .controlsOverlay {
-    padding: 16px;
+
+  .topBar, .bottomControls {
+    padding-left: 16px;
+    padding-right: 16px;
   }
 
-  .centerBtn {
-    width: 50px;
-    height: 50px;
+  .contentTitle {
+    font-size: 14px;
   }
 
-  .centerPlay {
-    width: 65px;
-    height: 65px;
+  .playPauseBtn {
+    width: 60px;
+    height: 60px;
   }
-  
+
+  .skipBtn {
+    width: 46px;
+    height: 46px;
+  }
+
   .centerControls {
-    gap: 20px;
+    gap: 24px;
   }
 
-  .volumeContainer:hover .volumeSliderWrapper {
-    width: 0;
-    opacity: 0;
+  .volumeGroup:hover {
+    max-width: 36px;
+    gap: 0;
   }
 }
