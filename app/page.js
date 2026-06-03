@@ -92,14 +92,32 @@ export default function Home() {
         
         if (user) {
           try {
+            const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString();
             const { data: notifData, error } = await supabase
               .from('notifications')
               .select('*')
               .eq('user_id', user.id)
+              .gte('created_at', fifteenMinutesAgo)
               .order('created_at', { ascending: false });
             if (!error) {
               setNotifications(notifData || []);
             }
+
+            // Real-time subscription for notifications
+            const channel = supabase.channel('user_notifications')
+              .on('postgres_changes', { 
+                event: 'INSERT', 
+                schema: 'public', 
+                table: 'notifications', 
+                filter: `user_id=eq.${user.id}` 
+              }, (payload) => {
+                setNotifications(prev => [payload.new, ...prev]);
+              })
+              .subscribe();
+
+            return () => {
+              supabase.removeChannel(channel);
+            };
           } catch (e) {
             // Ignore if notifications table doesn't exist
           }

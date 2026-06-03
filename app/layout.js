@@ -61,7 +61,13 @@ export default function RootLayout({ children }) {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         clearBrowserCache();
-        router.refresh();
+        // If not on a movie or episode page, do a hard reload to ensure fresh content
+        if (!window.location.pathname.startsWith('/movie') && !window.location.pathname.startsWith('/episode')) {
+          window.location.reload();
+        } else {
+          // Soft refresh for video pages to not interrupt playback if they paused
+          router.refresh();
+        }
       }
     };
     
