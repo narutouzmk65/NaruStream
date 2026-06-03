@@ -151,9 +151,18 @@ export default function EpisodeDetail() {
         .select('*')
         .eq('episode_id', id)
         .eq('is_active', true);
-      setStreams(streamsData || []);
-      if (streamsData && streamsData.length > 0) {
-        setActiveStream(streamsData[0]);
+
+      // Priorité : M3U8 / Lecteur Premium en premier, puis les autres
+      const isPremium = (s) =>
+        s.m3u8_url ||
+        (s.server_name && s.server_name.toLowerCase().includes('premium'));
+      const sortedStreams = [
+        ...(streamsData || []).filter(isPremium),
+        ...(streamsData || []).filter(s => !isPremium(s))
+      ];
+      setStreams(sortedStreams);
+      if (sortedStreams.length > 0) {
+        setActiveStream(sortedStreams[0]);
       }
 
       // Fetch all episodes for this season to show list

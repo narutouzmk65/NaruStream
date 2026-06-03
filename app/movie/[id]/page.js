@@ -250,12 +250,21 @@ export default function MovieDetail() {
           .select("*")
           .eq("movie_id", id)
           .eq("is_active", true);
-        setStreams(streamsData || []);
-        if (streamsData && streamsData.length > 0) {
-          const index = Math.max(0, Math.min((movieData.current_link_index || 0), streamsData.length - 1));
-          setCurrentStreamIndex(index);
-          setActiveStream(streamsData[index]);
-          logStreamEvent(streamsData[index], "success");
+
+        // Priorité : M3U8 / Lecteur Premium en premier, puis les autres
+        const isPremium = (s) =>
+          s.m3u8_url ||
+          (s.server_name && s.server_name.toLowerCase().includes('premium'));
+        const sortedStreams = [
+          ...(streamsData || []).filter(isPremium),
+          ...(streamsData || []).filter(s => !isPremium(s))
+        ];
+
+        setStreams(sortedStreams);
+        if (sortedStreams.length > 0) {
+          setCurrentStreamIndex(0);
+          setActiveStream(sortedStreams[0]);
+          logStreamEvent(sortedStreams[0], "success");
         }
       }
 
