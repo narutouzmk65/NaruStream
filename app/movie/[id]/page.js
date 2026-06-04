@@ -640,6 +640,22 @@ export default function MovieDetail() {
               {isInList ? "❌ Retirer de Ma Liste" : "➕ Ajouter à Ma Liste"}
             </button>
           </div>
+          <div style={{
+            background: 'rgba(255, 193, 7, 0.05)',
+            border: '1px dashed rgba(255, 193, 7, 0.2)',
+            borderRadius: '8px',
+            padding: '0.75rem 1rem',
+            marginTop: '1.5rem',
+            fontSize: '0.85rem',
+            color: '#ffe082',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            maxWidth: 'fit-content'
+          }}>
+            <span>⚠️</span>
+            <span>Des erreurs de lecture ou de bande-annonce peuvent parfois survenir en raison de flux externes.</span>
+          </div>
         </div>
       </div>
     </main>

@@ -751,7 +751,7 @@ export default function Home() {
           })}
           
           {/* Sagas Sections */}
-          {sagas.map(saga => {
+          {sagas.slice(0, 5).map(saga => {
             const sagaMovies = (saga.saga_movies || [])
               .sort((a, b) => a.order_number - b.order_number)
               .map(sm => sm.movies)
@@ -864,6 +864,16 @@ export default function Home() {
           })}
         </>
       )}
+      <footer className={styles.footer}>
+        <div className={styles.footerContent}>
+          <p>© {new Date().getFullYear()} NaruStream. Tous droits réservés.</p>
+          <div className={styles.footerLinks}>
+            <Link href="/confidentialite">Charte de Confidentialité</Link>
+            <span>•</span>
+            <Link href="/contact">Contact</Link>
+          </div>
+        </div>
+      </footer>
       {/* Mobile Bottom Navigation */}
       <nav className={`${styles.mobileNav} ${styles.mobileOnly}`}>
         <Link href="/" className={`${styles.mobileNavItem} ${styles.active}`}>

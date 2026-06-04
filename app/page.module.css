@@ -767,5 +767,54 @@
   
   .mobileNavItem {
     font-size: 0.65rem;
+}
+
+/* Footer Styles */
+.footer {
+  margin-top: auto;
+  padding: 3rem 2rem 5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(10, 10, 10, 0.8);
+  backdrop-filter: blur(10px);
+  position: relative;
+  z-index: 10;
+}
+
+.footerContent {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.footerLinks {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.footerLinks a {
+  color: #888;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footerLinks a:hover {
+  color: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+  .footer {
+    padding: 2rem 1rem 6rem; /* Extra padding at bottom for mobile nav overlap */
+  }
+  .footerContent {
+    flex-direction: column;
+    text-align: center;
   }
 }
+
