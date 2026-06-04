@@ -51,6 +51,7 @@ export default function CollectionsPage() {
           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
             <Link href="/" className={`${styles.navLink} ${styles.desktopOnly}`}>Accueil</Link>
             <Link href="/collections" className={`${styles.navLink} ${styles.desktopOnly}`}>Collections</Link>
+            <Link href="/roulette" className={`${styles.navLink} ${styles.desktopOnly}`}>🎰 Roulette</Link>
           </div>
         </nav>
       </header>

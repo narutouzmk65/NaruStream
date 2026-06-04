@@ -1,0 +1,369 @@
+.container {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  min-height: 100vh;
+  animation: fadeIn 1s ease-out;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 4rem;
+  background: linear-gradient(to bottom, rgba(10,10,10,0.95), transparent);
+  z-index: 1000;
+}
+
+.logo {
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: 1px;
+}
+
+.logo span {
+  font-size: 0.8rem;
+  background: var(--primary-color);
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 2px;
+}
+
+.nav {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.navLink {
+  font-family: var(--font-inter);
+  text-transform: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  color: var(--text-secondary);
+}
+
+.navLink:hover {
+  color: #fff;
+}
+
+.content {
+  padding: 8rem 4rem 4rem 4rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.5rem;
+}
+
+.titleSection {
+  text-align: center;
+}
+
+.title {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.filterPanel {
+  width: 100%;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.filterTitle {
+  font-size: 1rem;
+  color: var(--accent-color);
+  text-shadow: var(--accent-glow);
+}
+
+.optionsGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.optionButton {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text-secondary);
+  padding: 0.5rem 1.25rem;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: var(--font-inter);
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.optionButton:hover {
+  border-color: var(--primary-color);
+  color: #fff;
+}
+
+.optionButton.active {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: #fff;
+  box-shadow: var(--primary-glow);
+}
+
+/* Spinner section */
+.spinnerWrapper {
+  width: 100%;
+  position: relative;
+  margin: 1.5rem 0;
+}
+
+.spinnerContainer {
+  position: relative;
+  width: 100%;
+  height: 270px;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(15, 15, 15, 0.6);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+}
+
+.centerIndicator {
+  position: absolute;
+  left: 50%;
+  top: 5px;
+  bottom: 5px;
+  transform: translateX(-50%);
+  width: 168px; /* 160px card + 8px padding */
+  border: 2px solid var(--accent-color);
+  box-shadow: var(--accent-glow);
+  border-radius: 8px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.fadeLeft, .fadeRight {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 15%;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.fadeLeft {
+  left: 0;
+  background: linear-gradient(to right, var(--bg-color), transparent);
+}
+
+.fadeRight {
+  right: 0;
+  background: linear-gradient(to left, var(--bg-color), transparent);
+}
+
+.reelStrip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  will-change: transform;
+}
+
+.reelCard {
+  width: 160px;
+  height: 240px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
+.reelPoster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Winner Card Section */
+.winnerWrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.winnerCard {
+  display: flex;
+  gap: 2rem;
+  max-width: 800px;
+  width: 100%;
+  padding: 2rem;
+}
+
+.winnerPoster {
+  width: 200px;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.winnerInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.winnerTitle {
+  font-size: 2rem;
+  color: var(--accent-color);
+  text-shadow: var(--accent-glow);
+}
+
+.winnerMeta {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.winnerBadge {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  color: #ddd;
+}
+
+.winnerRating {
+  color: var(--accent-color);
+  font-weight: bold;
+}
+
+.winnerDesc {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  font-size: 0.95rem;
+  display: -webkit-box;
+  WebkitLineClamp: 4;
+  WebkitBoxOrient: vertical;
+  overflow: hidden;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 1rem;
+}
+
+.playButton {
+  background: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  box-shadow: var(--primary-glow);
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-family: var(--font-orbitron);
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.playButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 25px rgba(229, 9, 20, 0.8);
+}
+
+/* Sound toggle */
+.soundToggle {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.soundToggle:hover {
+  color: #fff;
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+  .header {
+    padding: 0.8rem 1rem;
+  }
+  
+  .content {
+    padding: 6rem 1rem 2rem 1rem;
+    gap: 1.5rem;
+  }
+  
+  .title {
+    font-size: 1.8rem;
+  }
+  
+  .winnerCard {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1.5rem;
+  }
+  
+  .winnerPoster {
+    width: 150px;
+    height: 225px;
+  }
+  
+  .winnerInfo {
+    align-items: center;
+  }
+  
+  .actionButtons {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .playButton {
+    width: 100%;
+  }
+}

@@ -300,6 +300,7 @@ export default function Home() {
             <Link href="/" className={`${styles.navLink} ${styles.desktopOnly}`}>Accueil</Link>
             <Link href="/collections" className={`${styles.navLink} ${styles.desktopOnly}`}>Collections</Link>
             <Link href="/ma-liste" className={`${styles.navLink} ${styles.desktopOnly}`}>Ma Liste</Link>
+            <Link href="/roulette" className={`${styles.navLink} ${styles.desktopOnly}`}>🎰 Roulette</Link>
             
             {/* Genre Dropdown */}
             <div 
