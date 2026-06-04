@@ -92,6 +92,7 @@ export default function RoulettePage() {
   
   const containerRef = useRef(null);
   const animRef = useRef(null);
+  const winnerRef = useRef(null);
   
   useEffect(() => {
     // Retrieve profile
@@ -162,6 +163,14 @@ export default function RoulettePage() {
     
     setFilteredPool(pool);
   }, [movies, selectedGenre, contentType, selectedProfile]);
+
+  useEffect(() => {
+    if (winner && !spinning && winnerRef.current) {
+      setTimeout(() => {
+        winnerRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
+    }
+  }, [winner, spinning]);
 
   const spinRoulette = () => {
     if (spinning || filteredPool.length === 0) return;
@@ -351,7 +360,7 @@ export default function RoulettePage() {
 
         {/* Winner Display Card */}
         {winner && !spinning && (
-          <div className={styles.winnerWrapper}>
+          <div ref={winnerRef} className={styles.winnerWrapper}>
             <div className={`${styles.winnerCard} glass-panel`}>
               <img src={winner.poster_url} alt={winner.title} className={styles.winnerPoster} />
               <div className={styles.winnerInfo}>
