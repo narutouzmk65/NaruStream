@@ -580,8 +580,8 @@ export default function Home() {
           <HeroCarousel movies={movies} />
 
           {/* Trouvez votre contenu par genre section */}
-          <section className={styles.genreExplorerSection}>
-            <h3 className={styles.sectionTitle}>
+          <section className="genre-explorer-section">
+            <h3 className="genre-explorer-section-title">
               🧭 TROUVE TON CONTENU PAR GENRE
             </h3>
             <div className={styles.carouselContainer}>
@@ -590,13 +590,13 @@ export default function Home() {
               </button>
               <div className={styles.carousel} ref={el => carouselRefs.current['genres-explorer'] = el}>
                 {genres.map((genre) => (
-                  <Link href={`/genre/${genre.slug}`} key={genre.slug} className={styles.genreCard}>
+                  <Link href={`/genre/${genre.slug}`} key={genre.slug} className="genre-card">
                     <div 
-                      className={styles.genreCardBg} 
+                      className="genre-card-bg" 
                       style={{ backgroundImage: `url(${getGenreBackdrop(genre.slug)})` }} 
                     />
-                    <div className={styles.genreCardOverlay} />
-                    <span className={styles.genreCardName}>{genre.name}</span>
+                    <div className="genre-card-overlay" />
+                    <span className="genre-card-name">{genre.name}</span>
                   </Link>
                 ))}
               </div>

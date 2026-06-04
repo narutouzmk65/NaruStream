@@ -302,3 +302,89 @@ a {
 ::-webkit-scrollbar-thumb:hover {
   background: #ff2a35;
 }
+
+/* Genre Explorer Global Classes */
+.genre-explorer-section {
+  margin: 2.5rem 0;
+  width: 100%;
+}
+
+.genre-explorer-section-title {
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  font-family: var(--font-orbitron) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1.5px !important;
+  margin: 2rem 4rem 1.5rem 4rem !important;
+  position: relative !important;
+}
+
+.genre-explorer-section-title::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 50px;
+  height: 3px;
+  background-color: var(--primary-color);
+  box-shadow: var(--primary-glow);
+}
+
+.genre-card {
+  flex: 0 0 auto;
+  width: 230px !important;
+  height: 110px !important;
+  border-radius: 10px !important;
+  position: relative !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  text-decoration: none !important;
+}
+
+.genre-card:hover {
+  transform: translateY(-4px) scale(1.03) !important;
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 5px 15px rgba(229, 9, 20, 0.3) !important;
+}
+
+.genre-card-bg {
+  position: absolute !important;
+  inset: 0 !important;
+  background-size: cover !important;
+  background-position: center !important;
+  transition: transform 0.5s ease !important;
+}
+
+.genre-card:hover .genre-card-bg {
+  transform: scale(1.1) !important;
+}
+
+.genre-card-overlay {
+  position: absolute !important;
+  inset: 0 !important;
+  background: rgba(0, 0, 0, 0.55) !important;
+  transition: background 0.3s ease !important;
+}
+
+.genre-card:hover .genre-card-overlay {
+  background: rgba(0, 0, 0, 0.35) !important;
+}
+
+.genre-card-name {
+  position: relative !important;
+  z-index: 2 !important;
+  color: #fff !important;
+  font-size: 1.15rem !important;
+  font-weight: 700 !important;
+  font-family: var(--font-inter) !important;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.9) !important;
+  letter-spacing: 0.5px !important;
+}
