@@ -42,7 +42,6 @@ export default function Home() {
   const [sagas, setSagas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [notifications, setNotifications] = useState([]);
@@ -320,27 +319,6 @@ export default function Home() {
             <Link href="/ma-liste" className={`${styles.navLink} ${styles.desktopOnly}`}>Ma Liste</Link>
             <Link href="/roulette" className={`${styles.navLink} ${styles.desktopOnly}`}>🎰 Roulette</Link>
             
-            {/* Genre Dropdown */}
-            <div 
-              className={`${styles.dropdown} ${styles.desktopOnly}`}
-              onMouseEnter={() => setDropdownOpen(true)}
-              onMouseLeave={() => setDropdownOpen(false)}
-            >
-              <button>Genres ▾</button>
-              {dropdownOpen && (
-                <div className={styles.dropdownMenu}>
-                  {genres.map(genre => (
-                    <Link 
-                      href={`/genre/${genre.slug}`} 
-                      key={genre.slug}
-                      className={styles.dropdownItem}
-                    >
-                      {genre.name}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
             
             {/* Prominent Request Button */}
             <Link href="/request" className={`${styles.navLink} ${styles.requestButton} ${styles.desktopOnly}`}>
