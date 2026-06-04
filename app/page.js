@@ -230,6 +230,23 @@ export default function Home() {
     return percentages[movieId] || 90;
   };
 
+  const getGenreBackdrop = (genreSlug) => {
+    const normalize = (str) => 
+      str.normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[-\s]/g, "")
+        .toLowerCase();
+
+    const movieWithGenre = movies.find(movie => {
+      if (!movie || !movie.category) return false;
+      const movieCategories = String(movie.category).toLowerCase().split(/[,;]/).map(s => s.trim());
+      const normalizedMovieCategories = movieCategories.map(normalize);
+      return normalizedMovieCategories.some(cat => cat.includes(normalize(genreSlug)));
+    });
+
+    return movieWithGenre?.backdrop_url || movieWithGenre?.poster_url || "https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=300&auto=format&fit=crop";
+  };
+
   // Générer le greeting seulement après le mount (pour éviter hydration error)
   const generateGreeting = useCallback(() => {
     const hour = new Date().getHours();
@@ -560,6 +577,34 @@ export default function Home() {
       ) : (
         <>
           <HeroCarousel movies={movies} />
+
+          {/* Trouvez votre contenu par genre section */}
+          <section className={styles.genreExplorerSection}>
+            <h3 className={styles.sectionTitle}>
+              🧭 TROUVE TON CONTENU PAR GENRE
+            </h3>
+            <div className={styles.carouselContainer}>
+              <button className={`${styles.carouselArrow} ${styles.left}`} onClick={() => scrollCarousel('genres-explorer', -1)}>
+                ‹
+              </button>
+              <div className={styles.carousel} ref={el => carouselRefs.current['genres-explorer'] = el}>
+                {genres.map((genre) => (
+                  <Link href={`/genre/${genre.slug}`} key={genre.slug} className={styles.genreCard}>
+                    <div 
+                      className={styles.genreCardBg} 
+                      style={{ backgroundImage: `url(${getGenreBackdrop(genre.slug)})` }} 
+                    />
+                    <div className={styles.genreCardOverlay} />
+                    <span className={styles.genreCardName}>{genre.name}</span>
+                  </Link>
+                ))}
+              </div>
+              <button className={`${styles.carouselArrow} ${styles.right}`} onClick={() => scrollCarousel('genres-explorer', 1)}>
+                ›
+              </button>
+            </div>
+          </section>
+
           <section>
           <h3 className={styles.sectionTitle}>Les tendances du moment sur NaruStream</h3>
             <div className={styles.carouselContainer}>

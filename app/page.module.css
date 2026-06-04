@@ -839,3 +839,74 @@
   letter-spacing: 0.5px;
 }
 
+/* Genre Explorer Section */
+.genreExplorerSection {
+  margin: 1.5rem 0;
+  width: 100%;
+}
+
+.genreExplorerSection .sectionTitle {
+  font-size: 1.3rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 2px solid var(--primary-color);
+  width: fit-content;
+  padding-bottom: 4px;
+  margin-bottom: 1.5rem;
+}
+
+.genreCard {
+  flex: 0 0 auto;
+  width: 220px;
+  height: 120px;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.genreCard:hover {
+  transform: scale(1.05);
+  border-color: var(--primary-color);
+}
+
+.genreCardBg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.5s ease;
+}
+
+.genreCard:hover .genreCardBg {
+  transform: scale(1.1);
+}
+
+.genreCardOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  transition: background 0.3s ease;
+}
+
+.genreCard:hover .genreCardOverlay {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.genreCardName {
+  position: relative;
+  z-index: 2;
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 700;
+  font-family: var(--font-inter);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+}
+
