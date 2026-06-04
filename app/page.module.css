@@ -818,3 +818,24 @@
   }
 }
 
+.legalNotice {
+  max-width: 1400px;
+  margin: 3rem auto 0;
+  padding: 1.5rem 2rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #777;
+  line-height: 1.6;
+  position: relative;
+  z-index: 10;
+}
+
+.legalNotice strong {
+  color: var(--primary-color);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
