@@ -33,9 +33,18 @@ export default function MovieDetail() {
   const [selectedSeason, setSelectedSeason] = useState(null);
   const [episodes, setEpisodes] = useState([]);
   const [selectedProfile, setSelectedProfile] = useState(null);
+  const [recommendations, setRecommendations] = useState([]);
   const watchTimerRef = useRef(null);
   const historyLoggedRef = useRef(false);
   const trailerSectionRef = useRef(null);
+  const carouselRefs = useRef({});
+
+  const scrollCarousel = (key, direction) => {
+    const carousel = carouselRefs.current[key];
+    if (!carousel) return;
+    const scrollAmount = 600;
+    carousel.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+  };
 
   // Helper function to convert age rating string to number
   const getAgeRatingNumber = (ageRating) => {
@@ -265,6 +274,26 @@ export default function MovieDetail() {
           setCurrentStreamIndex(0);
           setActiveStream(sortedStreams[0]);
           logStreamEvent(sortedStreams[0], "success");
+        }
+      }
+
+      // Fetch recommendations based on category
+      if (movieData && movieData.category) {
+        const categories = String(movieData.category).split(/[,;]/).map(s => s.trim());
+        if (categories.length > 0) {
+          const { data: recMoviesData } = await supabase
+            .from("movies")
+            .select("*")
+            .neq("id", id);
+          if (recMoviesData) {
+            const normalizedCategories = categories.map(c => c.toLowerCase());
+            const filteredRecs = recMoviesData.filter(m => {
+              if (!m.category) return false;
+              const mCats = String(m.category).toLowerCase().split(/[,;]/).map(s => s.trim());
+              return mCats.some(cat => normalizedCategories.includes(cat));
+            });
+            setRecommendations(filteredRecs.slice(0, 12));
+          }
         }
       }
 
@@ -658,6 +687,35 @@ export default function MovieDetail() {
           </div>
         </div>
       </div>
+
+      {recommendations.length > 0 && (
+        <section className={styles.recommendationsSection}>
+          <h3 className={styles.sectionTitle}>Contenus Similaires</h3>
+          <div className={styles.carouselContainer}>
+            <button className={`${styles.carouselArrow} ${styles.left}`} onClick={() => scrollCarousel('recs', -1)}>
+              ‹
+            </button>
+            <div className={styles.carousel} ref={el => carouselRefs.current['recs'] = el}>
+              {recommendations.map((recMovie) => (
+                <Link href={`/movie/${recMovie.id}`} key={recMovie.id} className={styles.movieCard}>
+                  <div style={{ position: 'relative' }}>
+                    <img src={recMovie.poster_url} alt={recMovie.title} className={styles.moviePoster} />
+                    <div className={styles.watchOverlay}>
+                      <button className={styles.watchButton}>▶ Voir</button>
+                    </div>
+                  </div>
+                  <div className={styles.movieInfo}>
+                    <h4 className={styles.movieTitle}>{recMovie.title}</h4>
+                  </div>
+                </Link>
+              ))}
+            </div>
+            <button className={`${styles.carouselArrow} ${styles.right}`} onClick={() => scrollCarousel('recs', 1)}>
+              ›
+            </button>
+          </div>
+        </section>
+      )}
     </main>
   );
 }
