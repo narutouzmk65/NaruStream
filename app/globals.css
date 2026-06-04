@@ -388,3 +388,66 @@ a {
   text-shadow: 0 2px 5px rgba(0, 0, 0, 0.9) !important;
   letter-spacing: 0.5px !important;
 }
+
+/* ── TMDB Notice Banner ── */
+.tmdb-notice {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  background: rgba(15, 10, 10, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid rgba(229, 9, 20, 0.35);
+  box-shadow: 0 -4px 24px rgba(229, 9, 20, 0.12);
+  font-family: var(--font-inter), sans-serif;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.5;
+}
+
+.tmdb-notice-icon {
+  font-size: 1.1rem;
+  color: var(--primary-color);
+  flex-shrink: 0;
+  animation: tmdb-pulse 2.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px rgba(229, 9, 20, 0.7));
+}
+
+@keyframes tmdb-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.6; transform: scale(1.15); }
+}
+
+.tmdb-notice p {
+  margin: 0;
+}
+
+.tmdb-link {
+  color: var(--primary-color);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-weight: 600;
+  transition: color 0.2s ease, text-shadow 0.2s ease;
+}
+
+.tmdb-link:hover {
+  color: #ff4d57;
+  text-shadow: 0 0 8px rgba(229, 9, 20, 0.6);
+}
+
+@media (max-width: 480px) {
+  .tmdb-notice {
+    padding: 10px 14px;
+    font-size: 0.74rem;
+    gap: 8px;
+  }
+  .tmdb-notice-icon {
+    font-size: 1rem;
+  }
+}
