@@ -327,11 +327,13 @@ export default function EpisodeDetail() {
             </div>
           </div>
         )}
-        {/* ── Mention légale (sous le lecteur) ── */}
+        {/* ── Mention légale TMDB (sous le lecteur) ── */}
         <div className={styles.legalNotice}>
           <span className={styles.legalNoticeIcon}>⚠</span>
           <p>
-            <strong>Avertissement Légal :</strong> La communauté NaruStream n&apos;héberge aucun film ni contenu vidéo sur ses serveurs. Le site se limite exclusivement au référencement de liens hypertextes pointant vers des lecteurs externes ou des sites existants. Des dysfonctionnements ou des erreurs de lecture/bande-annonce peuvent parfois survenir en raison de ces flux tiers. Aucune donnée personnelle n&apos;est collectée ou conservée par le service.
+            Les infos, saisons, dates de sortie, proviennent de la base de données publique{" "}
+            <a href="https://www.themoviedb.org" target="_blank" rel="noopener noreferrer" className={styles.tmdbLink}>TMDB</a>.
+            {" "}Il peut y avoir des erreurs ou des différences de dates de sortie selon le pays (ex&nbsp;: pas la même date en France qu&apos;en Amérique).
             <span className={styles.legalSeparator}> · </span>
             <Link href="/confidentialite" className={styles.privacyLink}>Charte de confidentialité →</Link>
           </p>
