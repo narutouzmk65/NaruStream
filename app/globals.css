@@ -389,8 +389,8 @@ a {
   letter-spacing: 0.5px !important;
 }
 
-/* ── TMDB Notice Banner (global, encadrée) ── */
-.tmdb-notice {
+/* ── Legal Notice Banner (global, encadrée) ── */
+.legal-notice-banner {
   position: fixed;
   bottom: 16px;
   left: 50%;
@@ -417,57 +417,30 @@ a {
   line-height: 1.6;
 }
 
-.tmdb-notice-icon {
+.legal-notice-banner strong {
+  color: #fff;
+}
+
+.legal-notice-icon {
   font-size: 1.1rem;
   color: var(--primary-color);
   flex-shrink: 0;
   margin-top: 2px;
-  animation: tmdb-pulse 2.5s ease-in-out infinite;
+  animation: legal-banner-pulse 2.5s ease-in-out infinite;
   filter: drop-shadow(0 0 6px rgba(229, 9, 20, 0.7));
 }
 
-@keyframes tmdb-pulse {
+@keyframes legal-banner-pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
   50%       { opacity: 0.6; transform: scale(1.15); }
 }
 
-.tmdb-notice p {
+.legal-notice-banner p {
   margin: 0;
 }
 
-.tmdb-link {
-  color: var(--primary-color);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  font-weight: 600;
-  transition: color 0.2s ease, text-shadow 0.2s ease;
-}
-
-.tmdb-link:hover {
-  color: #ff4d57;
-  text-shadow: 0 0 8px rgba(229, 9, 20, 0.6);
-}
-
-.tmdb-separator {
-  color: rgba(255, 255, 255, 0.28);
-  margin: 0 3px;
-}
-
-.tmdb-privacy-link {
-  color: var(--accent-color);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  font-weight: 600;
-  transition: color 0.2s ease, text-shadow 0.2s ease;
-}
-
-.tmdb-privacy-link:hover {
-  color: #ffd740;
-  text-shadow: 0 0 8px rgba(245, 197, 24, 0.6);
-}
-
 @media (max-width: 640px) {
-  .tmdb-notice {
+  .legal-notice-banner {
     bottom: 10px;
     width: calc(100% - 24px);
     padding: 10px 14px;
@@ -475,7 +448,7 @@ a {
     gap: 8px;
     border-radius: 8px;
   }
-  .tmdb-notice-icon {
+  .legal-notice-icon {
     font-size: 1rem;
   }
 }

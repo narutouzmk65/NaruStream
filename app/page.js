@@ -889,11 +889,6 @@ export default function Home() {
           })}
         </>
       )}
-      <div className={styles.legalNotice}>
-        <p>
-          <strong>Avertissement Légal :</strong> La communauté NaruStream n'héberge aucun film ni contenu vidéo sur ses serveurs. Le site se limite exclusivement au référencement de liens hypertextes pointant vers des lecteurs externes ou des sites existants. Des dysfonctionnements ou des erreurs de lecture/bande-annonce peuvent parfois survenir en raison de ces flux tiers. Aucune donnée personnelle n'est collectée ou conservée par le service.
-        </p>
-      </div>
       <footer className={styles.footer}>
         <div className={styles.footerContent}>
           <p>© {new Date().getFullYear()} NaruStream. Tous droits réservés.</p>

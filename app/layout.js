@@ -192,14 +192,10 @@ export default function RootLayout({ children }) {
       <body>
         <MobileBackHandler />
         {children}
-        <div className="tmdb-notice">
-          <span className="tmdb-notice-icon">⚠</span>
+        <div className="legal-notice-banner">
+          <span className="legal-notice-icon">⚠</span>
           <p>
-            Les infos, saisons, dates de sortie, proviennent de la base de données publique{" "}
-            <a href="https://www.themoviedb.org" target="_blank" rel="noopener noreferrer" className="tmdb-link">TMDB</a>.
-            {" "}Il peut y avoir des erreurs ou des différences de dates de sortie selon le pays (ex : pas la même date en France qu’en Amérique).
-            <span className="tmdb-separator"> · </span>
-            <a href="/confidentialite" className="tmdb-privacy-link">Charte de confidentialité →</a>
+            <strong>Avertissement Légal :</strong> La communauté NaruStream n&apos;héberge aucun film ni contenu vidéo sur ses serveurs. Le site se limite exclusivement au référencement de liens hypertextes pointant vers des lecteurs externes ou des sites existants. Des dysfonctionnements ou des erreurs de lecture/bande-annonce peuvent parfois survenir en raison de ces flux tiers. Aucune donnée personnelle n&apos;est collectée ou conservée par le service.
           </p>
         </div>
       </body>

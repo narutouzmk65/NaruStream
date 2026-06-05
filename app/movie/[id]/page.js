@@ -609,6 +609,15 @@ export default function MovieDetail() {
             </div>
           </div>
 
+          {/* ── Mention légale (sous le lecteur) ── */}
+          <div className={styles.legalNotice}>
+            <span className={styles.legalNoticeIcon}>⚠</span>
+            <p>
+              <strong>Avertissement Légal :</strong> La communauté NaruStream n&apos;héberge aucun film ni contenu vidéo sur ses serveurs. Le site se limite exclusivement au référencement de liens hypertextes pointant vers des lecteurs externes ou des sites existants. Des dysfonctionnements ou des erreurs de lecture/bande-annonce peuvent parfois survenir en raison de ces flux tiers. Aucune donnée personnelle n&apos;est collectée ou conservée par le service.
+              <span className={styles.legalSeparator}> · </span>
+              <Link href="/confidentialite" className={styles.privacyLink}>Charte de confidentialité →</Link>
+            </p>
+          </div>
       </div>
       )}
 
