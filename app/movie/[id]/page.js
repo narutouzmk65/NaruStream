@@ -609,17 +609,6 @@ export default function MovieDetail() {
             </div>
           </div>
 
-          {/* ── Mention légale TMDB ── */}
-          <div className={styles.legalNotice}>
-            <span className={styles.legalNoticeIcon}>⚠</span>
-            <p>
-              Les infos, saisons, dates de sortie, proviennent de la base de données publique{" "}
-              <a href="https://www.themoviedb.org" target="_blank" rel="noopener noreferrer" className={styles.tmdbLink}>TMDB</a>.
-              {" "}Il peut y avoir des erreurs ou des différences de dates de sortie selon le pays (ex&nbsp;: pas la même date en France qu&apos;en Amérique).
-              <span className={styles.legalSeparator}> · </span>
-              <Link href="/confidentialite" className={styles.privacyLink}>Charte de confidentialité →</Link>
-            </p>
-          </div>
       </div>
       )}
 
