@@ -192,14 +192,7 @@ export default function RootLayout({ children }) {
       <body>
         <MobileBackHandler />
         {children}
-        <div className="tmdb-notice">
-          <span className="tmdb-notice-icon">⚠</span>
-          <p>
-            Les infos, saisons, dates de sortie, proviennent de la base de données publique{" "}
-            <a href="https://www.themoviedb.org" target="_blank" rel="noopener noreferrer" className="tmdb-link">TMDB</a>.
-            {" "}Il peut y avoir des erreurs ou des différences de dates de sortie selon le pays (ex&nbsp;: pas la même date en France qu&apos;en Amérique).
-          </p>
-        </div>
+
       </body>
     </html>
   );
