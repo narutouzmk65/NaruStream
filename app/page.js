@@ -46,10 +46,11 @@ export default function Home() {
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [watchHistory, setWatchHistory] = useState([]);
   const carouselRefs = useRef({});
   const [isClient, setIsClient] = useState(false);
   const [percentages, setPercentages] = useState({});
-  const [greeting, setGreeting] = useState("Bienvenue !"); // Valeur par défaut
+  const [greeting, setGreeting] = useState("Bienvenue !");
   
   const unreadNotifications = notifications.filter(n => !n.is_read);
   
@@ -113,6 +114,17 @@ export default function Home() {
                 setNotifications(prev => [payload.new, ...prev]);
               })
               .subscribe();
+
+            // Fetch watch history with movie data
+            try {
+              const { data: histData } = await supabase
+                .from('watch_history')
+                .select('*, movies(id, title, poster_url, content_type), episodes(id, title, episode_number, season_id, seasons(season_number))')
+                .eq('user_id', user.id)
+                .order('watched_at', { ascending: false })
+                .limit(10);
+              if (histData) setWatchHistory(histData.filter(h => h.movies));
+            } catch (e) { /* ignore */ }
 
             return () => {
               supabase.removeChannel(channel);
@@ -556,6 +568,63 @@ export default function Home() {
       ) : (
         <>
           <HeroCarousel movies={movies} />
+
+          {/* ── Continuer à regarder ── */}
+          {user && watchHistory.length > 0 && (
+            <section>
+              <h3 className={styles.sectionTitle}>▶ Continuer à regarder</h3>
+              <div className={styles.carouselContainer}>
+                <button className={`${styles.carouselArrow} ${styles.left}`} onClick={() => scrollCarousel('history', -1)}>‹</button>
+                <div className={styles.carousel} ref={el => carouselRefs.current['history'] = el}>
+                  {watchHistory.map((entry) => {
+                    const movie = entry.movies;
+                    const ep = entry.episodes;
+                    const href = ep ? `/episode/${ep.id}` : `/movie/${movie.id}`;
+                    const progressPct = entry.progress > 0 ? Math.min(100, Math.round((entry.progress / (movie.duration_seconds || 5400)) * 100)) : 0;
+                    const subtitle = ep
+                      ? `S${ep.seasons?.season_number ?? '?'} · Ép. ${ep.episode_number} — ${ep.title}`
+                      : null;
+                    return (
+                      <Link href={href} key={entry.id} className={styles.movieCard}>
+                        <div style={{ position: 'relative' }}>
+                          <img src={movie.poster_url} alt={movie.title} className={styles.moviePoster} />
+                          {/* Resume play overlay */}
+                          <div className={styles.watchOverlay}>
+                            <button className={styles.watchButton}>▶ Reprendre</button>
+                          </div>
+                          {/* Progress bar */}
+                          {entry.progress > 0 && (
+                            <div style={{
+                              position: 'absolute',
+                              bottom: 0, left: 0, right: 0,
+                              height: '4px',
+                              background: 'rgba(255,255,255,0.2)',
+                              borderRadius: '0 0 4px 4px'
+                            }}>
+                              <div style={{
+                                width: `${progressPct}%`,
+                                height: '100%',
+                                background: 'linear-gradient(90deg, #e50914, #ff4d57)',
+                                borderRadius: '0 0 4px 4px',
+                                transition: 'width 0.3s ease'
+                              }} />
+                            </div>
+                          )}
+                        </div>
+                        <div className={styles.movieInfo}>
+                          <h4 className={styles.movieTitle}>{movie.title}</h4>
+                          {subtitle && (
+                            <span style={{ color: '#aaa', fontSize: '0.75rem' }}>{subtitle}</span>
+                          )}
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+                <button className={`${styles.carouselArrow} ${styles.right}`} onClick={() => scrollCarousel('history', 1)}>›</button>
+              </div>
+            </section>
+          )}
 
           {/* Trouvez votre contenu par genre section */}
           <section className="genre-explorer-section">

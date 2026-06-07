@@ -34,10 +34,13 @@ export default function MovieDetail() {
   const [episodes, setEpisodes] = useState([]);
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
+  const [savedProgress, setSavedProgress] = useState(0); // seconds
   const watchTimerRef = useRef(null);
   const historyLoggedRef = useRef(false);
   const trailerSectionRef = useRef(null);
   const carouselRefs = useRef({});
+  const progressSaveIntervalRef = useRef(null);
+  const iframeProgressRef = useRef(0);
 
   const scrollCarousel = (key, direction) => {
     const carousel = carouselRefs.current[key];
@@ -75,57 +78,64 @@ export default function MovieDetail() {
       .eq("id", stream.id);
   };
 
-  // Function to add to watch history
-  const addToWatchHistory = async () => {
-    if (historyLoggedRef.current) return;
-    historyLoggedRef.current = true;
-
+  // Save progress (in seconds) to watch_history
+  const saveProgress = async (progressSeconds) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      // Get current profile from sessionStorage
+      if (!user || !movie) return;
       let userProfile = null;
       if (typeof window !== "undefined") {
         const savedProfile = sessionStorage.getItem('current_profile');
-        if (savedProfile) {
-          userProfile = JSON.parse(savedProfile);
-        }
+        if (savedProfile) userProfile = JSON.parse(savedProfile);
       }
-
-      // Insert into watch_history
       await supabase.from("watch_history").upsert({
         user_id: user.id,
         user_profile_id: userProfile?.id || null,
         movie_id: movie.id,
         stream_id: activeStream?.id || null,
+        progress: Math.floor(progressSeconds),
         watched_at: new Date().toISOString(),
         is_completed: false
-      }, {
-        onConflict: 'user_id,movie_id'
-      });
+      }, { onConflict: 'user_id,movie_id' });
     } catch (error) {
-      console.error("Error adding to watch history:", error);
+      console.error("Error saving progress:", error);
     }
   };
 
-  // Start watch timer when stream becomes active
+  // Function to add to watch history (initial entry, no progress yet)
+  const addToWatchHistory = async () => {
+    if (historyLoggedRef.current) return;
+    historyLoggedRef.current = true;
+    await saveProgress(0);
+  };
+
+  // Start watch timer + iframe progress interval when stream becomes active
   useEffect(() => {
     if (activeStream && movie) {
-      // Clear any existing timer
-      if (watchTimerRef.current) {
-        clearTimeout(watchTimerRef.current);
-      }
-      // Start new 5 second timer
+      // Clear existing
+      if (watchTimerRef.current) clearTimeout(watchTimerRef.current);
+      if (progressSaveIntervalRef.current) clearInterval(progressSaveIntervalRef.current);
+      historyLoggedRef.current = false;
+      iframeProgressRef.current = savedProgress || 0;
+
+      // Log history after 5 seconds
       watchTimerRef.current = setTimeout(() => {
         addToWatchHistory();
       }, 5000);
+
+      // For iframe/non-M3U8 players: save progress every 10s using a counter
+      const isIframePlayer = !activeStream.m3u8_url && !(activeStream.server_name?.toLowerCase().includes('premium'));
+      if (isIframePlayer) {
+        progressSaveIntervalRef.current = setInterval(() => {
+          iframeProgressRef.current += 10;
+          saveProgress(iframeProgressRef.current);
+        }, 10000);
+      }
     }
 
     return () => {
-      if (watchTimerRef.current) {
-        clearTimeout(watchTimerRef.current);
-      }
+      if (watchTimerRef.current) clearTimeout(watchTimerRef.current);
+      if (progressSaveIntervalRef.current) clearInterval(progressSaveIntervalRef.current);
     };
   }, [activeStream, movie]);
   
@@ -234,8 +244,24 @@ export default function MovieDetail() {
 
       setMovie(movieData);
 
+      // Load saved progress for this movie
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: histData } = await supabase
+            .from('watch_history')
+            .select('progress')
+            .eq('user_id', user.id)
+            .eq('movie_id', id)
+            .single();
+          if (histData && histData.progress > 0) {
+            setSavedProgress(histData.progress);
+            iframeProgressRef.current = histData.progress;
+          }
+        }
+      } catch (e) { /* no saved progress */ }
+
       if (movieData.content_type === 'serie') {
-        // Fetch seasons for this series
         const { data: seasonsData } = await supabase
           .from('seasons')
           .select('*')
@@ -244,7 +270,6 @@ export default function MovieDetail() {
         setSeasons(seasonsData || []);
         if (seasonsData && seasonsData.length > 0) {
           setSelectedSeason(seasonsData[0]);
-          // Fetch episodes for first season
           const { data: episodesData } = await supabase
             .from('episodes')
             .select('*')
@@ -253,14 +278,12 @@ export default function MovieDetail() {
           setEpisodes(episodesData || []);
         }
       } else {
-        // It's a movie: fetch streams
         const { data: streamsData } = await supabase
           .from("streams")
           .select("*")
           .eq("movie_id", id)
           .eq("is_active", true);
 
-        // Priorité : M3U8 / Lecteur Premium en premier, puis les autres
         const isPremium = (s) =>
           s.m3u8_url ||
           (s.server_name && s.server_name.toLowerCase().includes('premium'));
@@ -277,7 +300,6 @@ export default function MovieDetail() {
         }
       }
 
-      // Fetch recommendations based on category
       if (movieData && movieData.category) {
         const categories = String(movieData.category).split(/[,;]/).map(s => s.trim());
         if (categories.length > 0) {
@@ -303,13 +325,9 @@ export default function MovieDetail() {
 
     fetchData();
 
-    // Auto-scroll when data loads
     const timer = setTimeout(() => {
       const playerSection = document.querySelector(".playerSection");
-      
-      if (playerSection) {
-        playerSection.scrollIntoView({ behavior: "smooth" });
-      }
+      if (playerSection) playerSection.scrollIntoView({ behavior: "smooth" });
     }, 500);
 
     return () => clearTimeout(timer);
@@ -555,6 +573,8 @@ export default function MovieDetail() {
                 <NarutostreamPlayer
                   src={activeStream.m3u8_url || activeStream.player_url}
                   poster={movie.backdrop_url || movie.poster_url}
+                  initialTime={savedProgress}
+                  onProgress={(t) => saveProgress(t)}
                 />
               ) : activeStream && activeStream.player_url ? (
                 <iframe

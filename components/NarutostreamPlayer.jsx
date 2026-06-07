@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import Hls from "hls.js";
 import styles from "./NarutostreamPlayer.module.css";
 
-export default function NarutostreamPlayer({ src, poster, title, episode }) {
+export default function NarutostreamPlayer({ src, poster, title, episode, initialTime = 0, onProgress }) {
   const videoRef = useRef(null);
   const containerRef = useRef(null);
   const progressRef = useRef(null);
@@ -23,6 +23,25 @@ export default function NarutostreamPlayer({ src, poster, title, episode }) {
   const [hoverX, setHoverX] = useState(0);
 
   const controlsTimeoutRef = useRef(null);
+  const hasSeekedRef = useRef(false);
+  const lastSavedTimeRef = useRef(0);
+
+  // Reset references when source changes
+  useEffect(() => {
+    hasSeekedRef.current = false;
+    lastSavedTimeRef.current = 0;
+  }, [src]);
+
+  // Handle initialTime seek if it loads asynchronously
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video && initialTime && initialTime > 0 && !hasSeekedRef.current) {
+      if (video.readyState >= 1) {
+        video.currentTime = initialTime;
+        hasSeekedRef.current = true;
+      }
+    }
+  }, [initialTime]);
 
   // ---- HLS setup ----
   useEffect(() => {
@@ -51,20 +70,39 @@ export default function NarutostreamPlayer({ src, poster, title, episode }) {
     }
 
     const onTimeUpdate = () => {
-      setCurrentTime(video.currentTime);
+      const time = video.currentTime;
+      setCurrentTime(time);
       if (video.buffered.length > 0) {
         setBuffered(video.buffered.end(video.buffered.length - 1));
       }
+
+      // Save progress every 10 seconds of playback
+      if (onProgress && Math.abs(time - lastSavedTimeRef.current) >= 10) {
+        lastSavedTimeRef.current = time;
+        onProgress(time);
+      }
     };
     const onDurationChange = () => setDuration(video.duration || 0);
+    const onLoadedMetadata = () => {
+      setDuration(video.duration || 0);
+      if (initialTime && initialTime > 0 && !hasSeekedRef.current) {
+        video.currentTime = initialTime;
+        hasSeekedRef.current = true;
+      }
+    };
     const onWaiting = () => setIsBuffering(true);
     const onCanPlay = () => setIsBuffering(false);
     const onPlay = () => setIsPlaying(true);
-    const onPause = () => setIsPlaying(false);
+    const onPause = () => {
+      setIsPlaying(false);
+      if (onProgress) {
+        onProgress(video.currentTime);
+      }
+    };
 
     video.addEventListener("timeupdate", onTimeUpdate);
     video.addEventListener("durationchange", onDurationChange);
-    video.addEventListener("loadedmetadata", onDurationChange);
+    video.addEventListener("loadedmetadata", onLoadedMetadata);
     video.addEventListener("waiting", onWaiting);
     video.addEventListener("canplay", onCanPlay);
     video.addEventListener("playing", onCanPlay);
@@ -72,9 +110,12 @@ export default function NarutostreamPlayer({ src, poster, title, episode }) {
     video.addEventListener("pause", onPause);
 
     return () => {
+      if (onProgress && videoRef.current) {
+        onProgress(videoRef.current.currentTime);
+      }
       video.removeEventListener("timeupdate", onTimeUpdate);
       video.removeEventListener("durationchange", onDurationChange);
-      video.removeEventListener("loadedmetadata", onDurationChange);
+      video.removeEventListener("loadedmetadata", onLoadedMetadata);
       video.removeEventListener("waiting", onWaiting);
       video.removeEventListener("canplay", onCanPlay);
       video.removeEventListener("playing", onCanPlay);
@@ -82,7 +123,7 @@ export default function NarutostreamPlayer({ src, poster, title, episode }) {
       video.removeEventListener("pause", onPause);
       if (hlsRef.current) hlsRef.current.destroy();
     };
-  }, [src]);
+  }, [src, initialTime, onProgress]);
 
   // ---- Controls auto-hide ----
   const showControlsTemporarily = useCallback(() => {

@@ -20,8 +20,11 @@ export default function EpisodeDetail() {
   const [loading, setLoading] = useState(true);
   const [allEpisodes, setAllEpisodes] = useState([]);
   const [selectedProfile, setSelectedProfile] = useState(null);
+  const [savedProgress, setSavedProgress] = useState(0);
   const watchTimerRef = useRef(null);
   const historyLoggedRef = useRef(false);
+  const progressSaveIntervalRef = useRef(null);
+  const iframeProgressRef = useRef(0);
 
   // Helper function to convert age rating string to number
   const getAgeRatingNumber = (ageRating) => {
@@ -52,58 +55,63 @@ export default function EpisodeDetail() {
       .eq('id', stream.id);
   };
 
-  // Function to add to watch history for episodes
-  const addToWatchHistory = async () => {
-    if (historyLoggedRef.current) return;
-    historyLoggedRef.current = true;
-
+  // Save progress (in seconds) to watch_history for episodes
+  const saveProgress = async (progressSeconds) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      // Get current profile from sessionStorage
+      if (!user || !series || !episode) return;
       let userProfile = null;
       if (typeof window !== "undefined") {
         const savedProfile = sessionStorage.getItem('current_profile');
-        if (savedProfile) {
-          userProfile = JSON.parse(savedProfile);
-        }
+        if (savedProfile) userProfile = JSON.parse(savedProfile);
       }
-
-      // Insert into watch_history (using movie_id for series)
       await supabase.from("watch_history").upsert({
         user_id: user.id,
         user_profile_id: userProfile?.id || null,
         movie_id: series.id,
         episode_id: episode.id,
         stream_id: activeStream?.id || null,
+        progress: Math.floor(progressSeconds),
         watched_at: new Date().toISOString(),
         is_completed: false
-      }, {
-        onConflict: 'user_id,movie_id'
-      });
+      }, { onConflict: 'user_id,movie_id' });
     } catch (error) {
-      console.error("Error adding episode to watch history:", error);
+      console.error("Error saving episode progress:", error);
     }
   };
 
-  // Start watch timer when stream becomes active
+  // Function to add to watch history for episodes
+  const addToWatchHistory = async () => {
+    if (historyLoggedRef.current) return;
+    historyLoggedRef.current = true;
+    await saveProgress(savedProgress || 0);
+  };
+
+  // Start watch timer + iframe progress interval when stream becomes active
   useEffect(() => {
     if (activeStream && series) {
-      // Clear any existing timer
-      if (watchTimerRef.current) {
-        clearTimeout(watchTimerRef.current);
-      }
-      // Start new 5 second timer
+      if (watchTimerRef.current) clearTimeout(watchTimerRef.current);
+      if (progressSaveIntervalRef.current) clearInterval(progressSaveIntervalRef.current);
+      historyLoggedRef.current = false;
+      iframeProgressRef.current = savedProgress || 0;
+
       watchTimerRef.current = setTimeout(() => {
         addToWatchHistory();
       }, 5000);
+
+      // For iframe/non-M3U8 players: save progress every 10s
+      const isIframePlayer = !activeStream.m3u8_url && !(activeStream.server_name?.toLowerCase().includes('premium'));
+      if (isIframePlayer) {
+        progressSaveIntervalRef.current = setInterval(() => {
+          iframeProgressRef.current += 10;
+          saveProgress(iframeProgressRef.current);
+        }, 10000);
+      }
     }
 
     return () => {
-      if (watchTimerRef.current) {
-        clearTimeout(watchTimerRef.current);
-      }
+      if (watchTimerRef.current) clearTimeout(watchTimerRef.current);
+      if (progressSaveIntervalRef.current) clearInterval(progressSaveIntervalRef.current);
     };
   }, [activeStream, series]);
 
@@ -129,7 +137,6 @@ export default function EpisodeDetail() {
 
   useEffect(() => {
     const fetchData = async () => {
-      // Fetch episode
       const { data: episodeData, error: episodeError } = await supabase
         .from('episodes')
         .select('*, seasons(*), movies(*)')
@@ -145,14 +152,30 @@ export default function EpisodeDetail() {
       setSeason(episodeData.seasons);
       setSeries(episodeData.movies);
 
-      // Fetch episode streams (only active)
+      // Load saved progress for this episode
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: histData } = await supabase
+            .from('watch_history')
+            .select('progress')
+            .eq('user_id', user.id)
+            .eq('movie_id', episodeData.movies.id)
+            .eq('episode_id', id)
+            .single();
+          if (histData && histData.progress > 0) {
+            setSavedProgress(histData.progress);
+            iframeProgressRef.current = histData.progress;
+          }
+        }
+      } catch (e) { /* no saved progress */ }
+
       const { data: streamsData } = await supabase
         .from('episode_streams')
         .select('*')
         .eq('episode_id', id)
         .eq('is_active', true);
 
-      // Priorité : M3U8 / Lecteur Premium en premier, puis les autres
       const isPremium = (s) =>
         s.m3u8_url ||
         (s.server_name && s.server_name.toLowerCase().includes('premium'));
@@ -165,7 +188,6 @@ export default function EpisodeDetail() {
         setActiveStream(sortedStreams[0]);
       }
 
-      // Fetch all episodes for this season to show list
       const { data: episodesData } = await supabase
         .from('episodes')
         .select('*')
@@ -240,7 +262,7 @@ export default function EpisodeDetail() {
       <div className={styles.playerSection}>
         {activeStream && (activeStream.m3u8_url || (activeStream.server_name && activeStream.server_name.toLowerCase().includes('premium'))) ? (
           <div>
-            <NarutostreamPlayer src={activeStream.m3u8_url || activeStream.player_url} poster={episode.poster_url || series.poster_url} />
+            <NarutostreamPlayer src={activeStream.m3u8_url || activeStream.player_url} poster={episode.poster_url || series.poster_url} initialTime={savedProgress} onProgress={(t) => saveProgress(t)} />
             <div className={styles.serverSelector}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
                 <h3 className="text-glow-accent">Serveurs Disponibles</h3>
