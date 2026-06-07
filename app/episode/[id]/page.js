@@ -94,10 +94,10 @@ export default function EpisodeDetail() {
       if (watchTimerRef.current) {
         clearTimeout(watchTimerRef.current);
       }
-      // Start new 8 second timer
+      // Start new 5 second timer
       watchTimerRef.current = setTimeout(() => {
         addToWatchHistory();
-      }, 8000);
+      }, 5000);
     }
 
     return () => {
