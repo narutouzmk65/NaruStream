@@ -397,12 +397,12 @@ a {
   transform: translateX(-50%);
   z-index: 9999;
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
+  align-items: center;
+  gap: 16px;
   padding: 13px 22px;
   width: calc(100% - 48px);
   max-width: 1100px;
-  background: rgba(12, 8, 8, 0.92);
+  background: rgba(12, 8, 8, 0.95);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(229, 9, 20, 0.40);
@@ -437,6 +437,68 @@ a {
 
 .legal-notice-banner p {
   margin: 0;
+  flex: 1;
+}
+
+.legal-notice-ok-btn {
+  background: var(--primary-color);
+  color: #fff;
+  border: 1px solid var(--primary-color);
+  box-shadow: var(--primary-glow);
+  padding: 6px 16px;
+  font-family: var(--font-orbitron), sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  align-self: center;
+  flex-shrink: 0;
+  letter-spacing: 1px;
+}
+
+.legal-notice-ok-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(229, 9, 20, 0.8);
+  background: #ff2a35;
+  border-color: #ff2a35;
+}
+
+.legal-notice-ok-btn:active {
+  transform: scale(0.95);
+}
+
+/* ── Legal Notice Minimized View ── */
+.legal-notice-minimized {
+  position: fixed;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+}
+
+.legal-notice-toggle-btn {
+  background: rgba(10, 10, 10, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
+  padding: 4px 12px;
+  font-size: 0.7rem;
+  font-family: var(--font-inter), sans-serif;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.legal-notice-toggle-btn:hover {
+  background: rgba(20, 20, 20, 0.95);
+  color: var(--primary-color);
+  border-color: rgba(229, 9, 20, 0.4);
+  box-shadow: 0 4px 15px rgba(229, 9, 20, 0.3);
 }
 
 @media (max-width: 640px) {
@@ -445,10 +507,18 @@ a {
     width: calc(100% - 24px);
     padding: 10px 14px;
     font-size: 0.74rem;
-    gap: 8px;
+    gap: 10px;
     border-radius: 8px;
+    flex-direction: column;
+    align-items: stretch;
   }
   .legal-notice-icon {
     font-size: 1rem;
+    align-self: flex-start;
+  }
+  .legal-notice-ok-btn {
+    align-self: flex-end;
+    width: auto;
+    padding: 6px 20px;
   }
 }

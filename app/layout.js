@@ -52,6 +52,27 @@ export default function RootLayout({ children }) {
   const pathname = usePathname();
   const router = useRouter();
 
+  const [isLegalDismissed, setIsLegalDismissed] = useState(true);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const dismissed = localStorage.getItem('legal_dismissed');
+      if (dismissed !== 'true') {
+        setIsLegalDismissed(false);
+      }
+    }
+  }, []);
+
+  const handleDismissLegal = () => {
+    setIsLegalDismissed(true);
+    localStorage.setItem('legal_dismissed', 'true');
+  };
+
+  const handleShowLegal = () => {
+    setIsLegalDismissed(false);
+    localStorage.removeItem('legal_dismissed');
+  };
+
   // Vider le cache à chaque chargement de l'app
   useEffect(() => {
     clearBrowserCache();
@@ -192,12 +213,23 @@ export default function RootLayout({ children }) {
       <body>
         <MobileBackHandler />
         {children}
-        <div className="legal-notice-banner">
-          <span className="legal-notice-icon">⚠</span>
-          <p>
-            <strong>Avertissement Légal :</strong> La communauté NaruStream n&apos;héberge aucun film ni contenu vidéo sur ses serveurs. Le site se limite exclusivement au référencement de liens hypertextes pointant vers des lecteurs externes ou des sites existants. Des dysfonctionnements ou des erreurs de lecture/bande-annonce peuvent parfois survenir en raison de ces flux tiers. Aucune donnée personnelle n&apos;est collectée ou conservée par le service.
-          </p>
-        </div>
+        {!isLegalDismissed ? (
+          <div className="legal-notice-banner">
+            <span className="legal-notice-icon">⚠</span>
+            <p>
+              <strong>Avertissement Légal :</strong> La communauté NaruStream n&apos;héberge aucun film ni contenu vidéo sur ses serveurs. Le site se limite exclusivement au référencement de liens hypertextes pointant vers des lecteurs externes ou des sites existants. Des dysfonctionnements ou des erreurs de lecture/bande-annonce peuvent parfois survenir en raison de ces flux tiers. Aucune donnée personnelle n&apos;est collectée ou conservée par le service.
+            </p>
+            <button onClick={handleDismissLegal} className="legal-notice-ok-btn">
+              OK
+            </button>
+          </div>
+        ) : (
+          <div className="legal-notice-minimized">
+            <button onClick={handleShowLegal} className="legal-notice-toggle-btn">
+              Avertissement Légal ⚠
+            </button>
+          </div>
+        )}
       </body>
     </html>
   );
