@@ -329,10 +329,20 @@ export default function Home() {
     return options[Math.floor(Math.random() * options.length)];
   }, [selectedProfile]);
 
+  // Filtrer les films avec un titre invalide ou vide (ex: "?????", null, etc.)
+  const isValidMovie = (movie) => {
+    if (!movie || !movie.title) return false;
+    const title = String(movie.title).trim();
+    // Exclure les titres qui sont uniquement des points d'interrogation ou vides
+    if (/^[?\s]+$/.test(title) || title.length === 0) return false;
+    return true;
+  };
+
   const filteredMovies = filterMoviesByAge(
-    searchQuery && searchResults
+    (searchQuery && searchResults
       ? searchResults
       : movies
+    ).filter(isValidMovie)
   );
 
   if (loading) {
@@ -529,7 +539,7 @@ export default function Home() {
                 <Link href={`/movie/${movie.id}`} key={movie.id} className={styles.movieCard}>
                   <div style={{ position: 'relative' }}>
                     {isNewMovie(movie) && <span className={styles.newBadge}>{t('new_badge')}</span>}
-                    <img src={movie.poster_url} alt={movie.title} className={styles.moviePoster} />
+                    <img src={movie.poster_url || "/placeholder.jpg"} alt={movie.title} className={styles.moviePoster} onError={(e) => { e.target.onerror = null; e.target.src = "/placeholder.jpg"; }} />
                     <div className={styles.matchPercentage}>{getRandomPercentage(movie.id)}%</div>
                     {/* Badges organized better */}
                     <div style={{ 
@@ -625,7 +635,7 @@ export default function Home() {
                     return (
                       <Link href={href} key={entry.id} className={styles.movieCard}>
                         <div style={{ position: 'relative' }}>
-                          <img src={movie.poster_url} alt={movie.title} className={styles.moviePoster} />
+                          <img src={movie.poster_url || "/placeholder.jpg"} alt={movie.title} className={styles.moviePoster} onError={(e) => { e.target.onerror = null; e.target.src = "/placeholder.jpg"; }} />
                           {/* Resume play overlay */}
                           <div className={styles.watchOverlay}>
                             <button className={styles.watchButton}>{t('resume')}</button>
@@ -698,11 +708,11 @@ export default function Home() {
                 ‹
               </button>
               <div className={styles.carousel} ref={el => carouselRefs.current['trending'] = el}>
-              {movies.map((movie) => (
+              {movies.filter(isValidMovie).map((movie) => (
               <Link href={`/movie/${movie.id}`} key={movie.id} className={styles.movieCard}>
                 <div style={{ position: 'relative' }}>
                     {isNewMovie(movie) && <span className={styles.newBadge}>NOUVEAU</span>}
-                    <img src={movie.poster_url} alt={movie.title} className={styles.moviePoster} />
+                    <img src={movie.poster_url || "/placeholder.jpg"} alt={movie.title} className={styles.moviePoster} onError={(e) => { e.target.onerror = null; e.target.src = "/placeholder.jpg"; }} />
                     <div className={styles.matchPercentage}>{getRandomPercentage(movie.id)}%</div>
                     {/* Age rating in top-right, NOUVEAU in top-left */}
                         <div style={{ 
@@ -818,7 +828,7 @@ export default function Home() {
                             {t('new_badge')}
                           </span>
                         )}
-                        <img src={movie.poster_url} alt={movie.title} className={styles.moviePoster} />
+                        <img src={movie.poster_url || "/placeholder.jpg"} alt={movie.title} className={styles.moviePoster} onError={(e) => { e.target.onerror = null; e.target.src = "/placeholder.jpg"; }} />
                     <div className={styles.matchPercentage}>{getRandomPercentage(movie.id)}%</div>
                     {/* Age rating in top-right, same size as NOUVEAU */}
                     <div style={{ 
@@ -931,7 +941,7 @@ export default function Home() {
                             {t('new_badge')}
                           </span>
                         )}
-                        <img src={movie.poster_url} alt={movie.title} className={styles.moviePoster} />
+                        <img src={movie.poster_url || "/placeholder.jpg"} alt={movie.title} className={styles.moviePoster} onError={(e) => { e.target.onerror = null; e.target.src = "/placeholder.jpg"; }} />
                     <div className={styles.matchPercentage}>{getRandomPercentage(movie.id)}%</div>
                     {/* Age rating in top-right, same size as NOUVEAU */}
                     <div style={{ 
@@ -1026,6 +1036,7 @@ export default function Home() {
     </main>
   );
 }
+
 
 
 

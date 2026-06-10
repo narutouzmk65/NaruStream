@@ -71,6 +71,7 @@ export default function AdminDashboard() {
   const [editingBanner, setEditingBanner] = useState(null);
 
   // Comprehensive Form State
+  const [adminSearch, setAdminSearch] = useState('');
   const [contentType, setContentType] = useState('film');
   const [movieTitle, setMovieTitle] = useState('');
   const [movieDesc, setMovieDesc] = useState('');
@@ -1682,18 +1683,88 @@ export default function AdminDashboard() {
 
           {/* Manage Existing Content Section */}
           <div className={styles.panel} style={{ gridColumn: '1 / -1', marginTop: '2rem' }}>
-            <h2 className="text-glow-pink">Gérer les contenus</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
-              {movies.length === 0 && <p style={{ color: 'white' }}>Aucun contenu à afficher.</p>}
-              {movies.map(movie => (
-                <div key={movie.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}>
-                  <div>
-                    <strong style={{ color: 'white', fontSize: '1.1rem' }}>{movie.title}</strong> 
-                    <span style={{ color: '#aaa', marginLeft: '10px' }}>{movie.release_year ? `(${movie.release_year})` : ''} - {movie.content_type?.toUpperCase()}</span>
-                  </div>
-                  <div style={{ display: 'flex', gap: '10px' }}>
-                    <button onClick={() => handleEditClick(movie)} className="cyber-button" style={{ padding: '6px 12px', fontSize: '0.9rem' }}>Modifier</button>
-                    <button onClick={() => handleDelete(movie.id)} className="cyber-button" style={{ padding: '6px 12px', fontSize: '0.9rem', borderColor: 'var(--neon-pink)', color: 'var(--neon-pink)' }}>Supprimer</button>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <h2 className="text-glow-pink">Gérer les contenus <span style={{ color: '#aaa', fontSize: '0.9rem', fontWeight: 'normal' }}>({movies.length} entrées)</span></h2>
+              <input
+                type="text"
+                placeholder="🔍 Filtrer par titre..."
+                onChange={(e) => setAdminSearch(e.target.value)}
+                style={{
+                  background: 'rgba(255,255,255,0.07)',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  color: 'white',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '8px',
+                  fontSize: '0.95rem',
+                  outline: 'none',
+                  width: '280px'
+                }}
+              />
+            </div>
+
+            {movies.length === 0 && <p style={{ color: 'white' }}>Aucun contenu à afficher.</p>}
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+              gap: '1rem',
+            }}>
+              {movies
+                .filter(m => !adminSearch || m.title?.toLowerCase().includes(adminSearch.toLowerCase()))
+                .map(movie => (
+                <div key={movie.id} style={{ position: 'relative', borderRadius: '10px', overflow: 'hidden', cursor: 'pointer', aspectRatio: '2/3', background: '#111' }}
+                  onMouseEnter={e => e.currentTarget.querySelector('.admin-overlay').style.opacity = '1'}
+                  onMouseLeave={e => e.currentTarget.querySelector('.admin-overlay').style.opacity = '0'}
+                >
+                  {/* Jaquette */}
+                  <img
+                    src={movie.poster_url || '/placeholder.jpg'}
+                    alt={movie.title}
+                    onError={(e) => { e.target.onerror = null; e.target.src = '/placeholder.jpg'; }}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  />
+                  {/* Badge type */}
+                  <span style={{
+                    position: 'absolute', top: '6px', left: '6px',
+                    background: movie.content_type === 'serie' ? 'rgba(0,150,255,0.85)' : 'rgba(229,9,20,0.85)',
+                    color: 'white', fontSize: '0.6rem', fontWeight: '700',
+                    padding: '2px 6px', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.5px'
+                  }}>
+                    {movie.content_type === 'serie' ? 'SÉRIE' : 'FILM'}
+                  </span>
+                  {/* Overlay au survol */}
+                  <div className="admin-overlay" style={{
+                    position: 'absolute', inset: 0,
+                    background: 'linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 60%, transparent 100%)',
+                    opacity: 0,
+                    transition: 'opacity 0.25s ease',
+                    display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
+                    padding: '0.6rem', gap: '0.4rem'
+                  }}>
+                    <p style={{ color: 'white', fontSize: '0.75rem', fontWeight: '700', margin: 0, lineHeight: 1.2 }}>
+                      {movie.title}
+                    </p>
+                    <p style={{ color: '#aaa', fontSize: '0.65rem', margin: 0 }}>
+                      {movie.release_year || '—'}
+                    </p>
+                    <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.3rem' }}>
+                      <button
+                        onClick={() => handleEditClick(movie)}
+                        style={{
+                          flex: 1, padding: '5px 0', fontSize: '0.7rem',
+                          background: 'rgba(0,150,255,0.8)', border: 'none',
+                          color: 'white', borderRadius: '5px', cursor: 'pointer', fontWeight: '700'
+                        }}
+                      >✏️ Modif.</button>
+                      <button
+                        onClick={() => handleDelete(movie.id)}
+                        style={{
+                          flex: 1, padding: '5px 0', fontSize: '0.7rem',
+                          background: 'rgba(229,9,20,0.8)', border: 'none',
+                          color: 'white', borderRadius: '5px', cursor: 'pointer', fontWeight: '700'
+                        }}
+                      >🗑️ Suppr.</button>
+                    </div>
                   </div>
                 </div>
               ))}
