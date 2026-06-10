@@ -84,7 +84,7 @@ export default function HeroCarousel({ movies }) {
         <button className={styles.navArrow} onClick={prevSlide}>
           ‹
         </button>
-        <button className={styles.navArrow} style={{ right: "2rem" }} onClick={nextSlide}>
+        <button className={styles.navArrow} style={{ right: "2rem", left: "auto" }} onClick={nextSlide}>
           ›
         </button>
 
