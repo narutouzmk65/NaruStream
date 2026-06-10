@@ -78,6 +78,7 @@ export default function RequestPage() {
             >
               <option value="film">Film</option>
               <option value="serie">Série</option>
+              <option value="anime">Animation / Anime</option>
             </select>
           </div>
 
