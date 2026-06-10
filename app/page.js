@@ -5,6 +5,8 @@ import styles from "./page.module.css";
 import { supabase } from "@/lib/supabase";
 import SearchBar from "@/components/SearchBar";
 import HeroCarousel from "@/components/HeroCarousel";
+import { useLanguage } from '@/lib/i18n/LanguageContext';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 // Fonction pour vider seulement le cache navigateur (pas localStorage/sessionStorage)
 const clearBrowserCache = () => {
@@ -50,6 +52,7 @@ export default function Home() {
   const carouselRefs = useRef({});
   const [isClient, setIsClient] = useState(false);
   const [percentages, setPercentages] = useState({});
+  const { t } = useLanguage();
   const [greeting, setGreeting] = useState("Bienvenue !");
   
   const unreadNotifications = notifications.filter(n => !n.is_read);
@@ -209,8 +212,29 @@ export default function Home() {
     }
   };
 
-  const handleSearch = (q) => {
+  const [searchResults, setSearchResults] = useState(null);
+
+  const handleSearch = async (q) => {
     setSearchQuery(q);
+    if (q.trim().length > 0) {
+      // Recherche côté serveur pour contourner la limite de 1000 lignes de Supabase
+      try {
+        const { data, error } = await supabase
+          .from('movies')
+          .select('*')
+          .ilike('title', `%${q}%`)
+          .order('created_at', { ascending: false })
+          .limit(100);
+        
+        if (!error && data) {
+          setSearchResults(data);
+        }
+      } catch (e) {
+        console.error("Erreur de recherche:", e);
+      }
+    } else {
+      setSearchResults(null);
+    }
   };
 
   // Helper function to convert age rating string to number
@@ -294,8 +318,8 @@ export default function Home() {
   }, [selectedProfile]);
 
   const filteredMovies = filterMoviesByAge(
-    searchQuery
-      ? movies.filter(movie => movie.title.toLowerCase().includes(searchQuery.toLowerCase()))
+    searchQuery && searchResults
+      ? searchResults
       : movies
   );
 
@@ -326,25 +350,27 @@ export default function Home() {
           
           {/* Boutons desktop seulement */}
           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-            <Link href="/" className={`${styles.navLink} ${styles.desktopOnly}`}>Accueil</Link>
-            <Link href="/collections" className={`${styles.navLink} ${styles.desktopOnly}`}>Collections</Link>
-            <Link href="/ma-liste" className={`${styles.navLink} ${styles.desktopOnly}`}>Ma Liste</Link>
-            <Link href="/roulette" className={`${styles.navLink} ${styles.desktopOnly}`}>🎰 Roulette</Link>
+            <LanguageSwitcher />
+            
+            <Link href="/" className={`${styles.navLink} ${styles.desktopOnly}`}>{t('nav_home')}</Link>
+            <Link href="/collections" className={`${styles.navLink} ${styles.desktopOnly}`}>{t('nav_collections')}</Link>
+            <Link href="/ma-liste" className={`${styles.navLink} ${styles.desktopOnly}`}>{t('nav_list')}</Link>
+            <Link href="/roulette" className={`${styles.navLink} ${styles.desktopOnly}`}>{t('nav_roulette')}</Link>
             
             
             {/* Prominent Request Button */}
             <Link href="/request" className={`${styles.navLink} ${styles.requestButton} ${styles.desktopOnly}`}>
-              🎬 Demander un film
+              {t('nav_request')}
             </Link>
             
             {/* Contact Button */}
             <Link href="/contact" className={`${styles.navLink} ${styles.desktopOnly}`}>
-              📞 Contact
+              {t('nav_contact')}
             </Link>
 
             {/* Download Button */}
             <Link href="/download" className={`${styles.navLink} ${styles.requestButton} ${styles.desktopOnly}`}>
-              📲 Télécharger
+              {t('nav_download')}
             </Link>
             
             {/* Notifications */}
@@ -401,7 +427,7 @@ export default function Home() {
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                      <h4 style={{ color: 'white', margin: 0 }}>Notifications</h4>
+                      <h4 style={{ color: 'white', margin: 0 }}>{t('notifications')}</h4>
                       {unreadNotifications.length > 0 && (
                         <button
                           onClick={() => markAllAsRead()}
@@ -415,12 +441,12 @@ export default function Home() {
                             fontSize: '0.8rem'
                           }}
                         >
-                          Marquer tout comme lu
+                          {t('mark_all_read')}
                         </button>
                       )}
                     </div>
                     {unreadNotifications.length === 0 ? (
-                      <p style={{ color: '#aaa' }}>Aucune notification non lue</p>
+                      <p style={{ color: '#aaa' }}>{t('no_notifications')}</p>
                     ) : (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                         {unreadNotifications.map(notif => (
@@ -459,12 +485,12 @@ export default function Home() {
             {/* Auth Links */}
             {user ? (
               <Link href="/profiles" className={`${styles.navLink} ${styles.requestButton} ${styles.desktopOnly}`}>
-                🎭 Profils
+                {t('nav_profiles')}
               </Link>
             ) : (
-              <div className={styles.desktopOnly}>
-                <Link href="/login" className={styles.navLink}>Se connecter</Link>
-                <Link href="/login" className={`${styles.navLink} ${styles.requestButton}`}>S&apos;inscrire</Link>
+              <div className={styles.desktopOnly} style={{ display: 'flex', gap: '0.5rem' }}>
+                <Link href="/login" className={styles.navLink}>{t('nav_login')}</Link>
+                <Link href="/login" className={`${styles.navLink} ${styles.requestButton}`}>{t('nav_signup')}</Link>
               </div>
             )}
           </div>
@@ -482,15 +508,15 @@ export default function Home() {
 
       {searchQuery ? (
         <section className={styles.searchResults}>
-          <h3 className={styles.sectionTitle}>Résultats pour &quot;{searchQuery}&quot;</h3>
+          <h3 className={styles.sectionTitle}>{t('search_results')} &quot;{searchQuery}&quot;</h3>
           <div className={styles.grid}>
             {filteredMovies.length === 0 ? (
-              <p style={{ color: 'white', gridColumn: '1 / -1', fontSize: '1.2rem', textAlign: 'center', padding: '3rem 0' }}>Aucun film ne correspond à votre recherche.</p>
+              <p style={{ color: 'white', gridColumn: '1 / -1', fontSize: '1.2rem', textAlign: 'center', padding: '3rem 0' }}>{t('no_results')}</p>
             ) : (
               filteredMovies.map((movie) => (
                 <Link href={`/movie/${movie.id}`} key={movie.id} className={styles.movieCard}>
                   <div style={{ position: 'relative' }}>
-                    {isNewMovie(movie) && <span className={styles.newBadge}>NOUVEAU</span>}
+                    {isNewMovie(movie) && <span className={styles.newBadge}>{t('new_badge')}</span>}
                     <img src={movie.poster_url} alt={movie.title} className={styles.moviePoster} />
                     <div className={styles.matchPercentage}>{getRandomPercentage(movie.id)}%</div>
                     {/* Badges organized better */}
@@ -538,7 +564,7 @@ export default function Home() {
                     </div>
                     {/* Watch Now Button Overlay */}
                     <div className={styles.watchOverlay}>
-                      <button className={styles.watchButton}>▶ Voir maintenant</button>
+                      <button className={styles.watchButton}>{t('watch_now')}</button>
                     </div>
                   </div>
                   <div className={styles.movieInfo}>
@@ -572,7 +598,7 @@ export default function Home() {
           {/* ── Continuer à regarder ── */}
           {user && watchHistory.length > 0 && (
             <section>
-              <h3 className={styles.sectionTitle}>▶ Continuer à regarder</h3>
+              <h3 className={styles.sectionTitle}>{t('continue_watching')}</h3>
               <div className={styles.carouselContainer}>
                 <button className={`${styles.carouselArrow} ${styles.left}`} onClick={() => scrollCarousel('history', -1)}>‹</button>
                 <div className={styles.carousel} ref={el => carouselRefs.current['history'] = el}>
@@ -590,7 +616,7 @@ export default function Home() {
                           <img src={movie.poster_url} alt={movie.title} className={styles.moviePoster} />
                           {/* Resume play overlay */}
                           <div className={styles.watchOverlay}>
-                            <button className={styles.watchButton}>▶ Reprendre</button>
+                            <button className={styles.watchButton}>{t('resume')}</button>
                           </div>
                           {/* Progress bar */}
                           {entry.progress > 0 && (
@@ -629,7 +655,7 @@ export default function Home() {
           {/* Trouvez votre contenu par genre section */}
           <section className="genre-explorer-section">
             <h3 className="genre-explorer-section-title">
-              🧭 TROUVE TON CONTENU PAR GENRE
+              {t('find_by_genre')}
             </h3>
             <div className={styles.carouselContainer}>
               <button className={`${styles.carouselArrow} ${styles.left}`} onClick={() => scrollCarousel('genres-explorer', -1)}>
@@ -654,7 +680,7 @@ export default function Home() {
           </section>
 
           <section>
-          <h3 className={styles.sectionTitle}>Les tendances du moment sur NaruStream</h3>
+          <h3 className={styles.sectionTitle}>{t('trending')}</h3>
             <div className={styles.carouselContainer}>
               <button className={`${styles.carouselArrow} ${styles.left}`} onClick={() => scrollCarousel('trending', -1)}>
                 ‹
@@ -696,7 +722,7 @@ export default function Home() {
                         </div>
                     {/* Watch Now Button Overlay */}
                     <div className={styles.watchOverlay}>
-                      <button className={styles.watchButton}>▶ Voir maintenant</button>
+                      <button className={styles.watchButton}>{t('watch_now')}</button>
                     </div>
                   </div>
                   <div className={styles.movieInfo}>
@@ -777,7 +803,7 @@ export default function Home() {
                             boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
                             textTransform: 'uppercase'
                           }}>
-                            NOUVEAU
+                            {t('new_badge')}
                           </span>
                         )}
                         <img src={movie.poster_url} alt={movie.title} className={styles.moviePoster} />
@@ -811,7 +837,7 @@ export default function Home() {
                     </div>
                     {/* Watch Now Button Overlay */}
                     <div className={styles.watchOverlay}>
-                      <button className={styles.watchButton}>▶ Voir maintenant</button>
+                      <button className={styles.watchButton}>{t('watch_now')}</button>
                     </div>
                   </div>
                   <div className={styles.movieInfo}>
@@ -890,7 +916,7 @@ export default function Home() {
                             boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
                             textTransform: 'uppercase'
                           }}>
-                            NOUVEAU
+                            {t('new_badge')}
                           </span>
                         )}
                         <img src={movie.poster_url} alt={movie.title} className={styles.moviePoster} />
@@ -924,7 +950,7 @@ export default function Home() {
                     </div>
                     {/* Watch Now Button Overlay */}
                     <div className={styles.watchOverlay}>
-                      <button className={styles.watchButton}>▶ Voir maintenant</button>
+                      <button className={styles.watchButton}>{t('watch_now')}</button>
                     </div>
                   </div>
                   <div className={styles.movieInfo}>

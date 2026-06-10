@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import MobileBackHandler from "@/components/MobileBackHandler";
+import { LanguageProvider } from "@/lib/i18n/LanguageContext";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -211,25 +212,27 @@ export default function RootLayout({ children }) {
         <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https:; frame-src *; img-src * data: blob:; media-src * data: blob:;" />
       </head>
       <body>
-        <MobileBackHandler />
-        {children}
-        {!isLegalDismissed ? (
-          <div className="legal-notice-banner">
-            <span className="legal-notice-icon">⚠</span>
-            <p>
-              <strong>Avertissement Légal :</strong> La communauté NaruStream n&apos;héberge aucun film ni contenu vidéo sur ses serveurs. Le site se limite exclusivement au référencement de liens hypertextes pointant vers des lecteurs externes ou des sites existants. Des dysfonctionnements ou des erreurs de lecture/bande-annonce peuvent parfois survenir en raison de ces flux tiers. Aucune donnée personnelle n&apos;est collectée ou conservée par le service.
-            </p>
-            <button onClick={handleDismissLegal} className="legal-notice-ok-btn">
-              OK
-            </button>
-          </div>
-        ) : (
-          <div className="legal-notice-minimized">
-            <button onClick={handleShowLegal} className="legal-notice-toggle-btn">
-              Avertissement Légal ⚠
-            </button>
-          </div>
-        )}
+        <LanguageProvider>
+          <MobileBackHandler />
+          {children}
+          {!isLegalDismissed ? (
+            <div className="legal-notice-banner">
+              <span className="legal-notice-icon">⚠</span>
+              <p>
+                <strong>Avertissement Légal :</strong> La communauté NaruStream n&apos;héberge aucun film ni contenu vidéo sur ses serveurs. Le site se limite exclusivement au référencement de liens hypertextes pointant vers des lecteurs externes ou des sites existants. Des dysfonctionnements ou des erreurs de lecture/bande-annonce peuvent parfois survenir en raison de ces flux tiers. Aucune donnée personnelle n&apos;est collectée ou conservée par le service.
+              </p>
+              <button onClick={handleDismissLegal} className="legal-notice-ok-btn">
+                OK
+              </button>
+            </div>
+          ) : (
+            <div className="legal-notice-minimized">
+              <button onClick={handleShowLegal} className="legal-notice-toggle-btn">
+                Avertissement Légal ⚠
+              </button>
+            </div>
+          )}
+        </LanguageProvider>
       </body>
     </html>
   );

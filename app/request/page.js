@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import styles from './request.module.css';
 import { supabase } from '@/lib/supabase';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 export default function RequestPage() {
+  const { t } = useLanguage();
   const [contentType, setContentType] = useState('film');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -55,12 +57,12 @@ export default function RequestPage() {
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <Link href="/" className={styles.backLink}>← Retour à l&apos;accueil</Link>
-        <h1 className="text-glow-pink">Demander un contenu</h1>
+        <Link href="/" className={styles.backLink}>{t('back_home')}</Link>
+        <h1 className="text-glow-pink">{t('request_title')}</h1>
       </header>
 
       <div className={styles.panel}>
-        <h2 className="text-glow-blue">Faites-nous savoir ce que vous voulez voir !</h2>
+        <h2 className="text-glow-blue">{t('request_subtitle')}</h2>
         
         {successMessage && (
           <div className={styles.successMessage}>
@@ -70,49 +72,49 @@ export default function RequestPage() {
 
         <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.formGroup}>
-            <label>Type de contenu</label>
+            <label>{t('type_label')}</label>
             <select 
               className={styles.input} 
               value={contentType} 
               onChange={(e) => setContentType(e.target.value)}
             >
-              <option value="film">Film</option>
-              <option value="serie">Série</option>
-              <option value="anime">Animation / Anime</option>
+              <option value="film">{t('type_movie')}</option>
+              <option value="serie">{t('type_serie')}</option>
+              <option value="anime">{t('type_anime')}</option>
             </select>
           </div>
 
           <div className={styles.formGroup}>
-            <label>Titre *</label>
+            <label>{t('title_label')}</label>
             <input 
               type="text" 
               className={styles.input} 
               value={title} 
               onChange={(e) => setTitle(e.target.value)} 
-              placeholder="Ex: Le Parrain" 
+              placeholder={t('title_placeholder')} 
               required 
             />
           </div>
 
           <div className={styles.formGroup}>
-            <label>Votre pseudo (optionnel)</label>
+            <label>{t('pseudo_label')}</label>
             <input 
               type="text" 
               className={styles.input} 
               value={requestedBy} 
               onChange={(e) => setRequestedBy(e.target.value)} 
-              placeholder="Votre pseudo" 
+              placeholder={t('pseudo_placeholder')} 
             />
           </div>
 
           <div className={styles.formGroup}>
-            <label>Commentaires (optionnel)</label>
+            <label>{t('comments_label')}</label>
             <textarea 
               className={styles.input} 
               rows="4" 
               value={description} 
               onChange={(e) => setDescription(e.target.value)} 
-              placeholder="Informations supplémentaires..." 
+              placeholder={t('comments_placeholder')} 
             />
           </div>
 
@@ -122,7 +124,7 @@ export default function RequestPage() {
             disabled={isSubmitting}
             style={{ width: '100%' }}
           >
-            {isSubmitting ? 'Envoi en cours...' : 'Envoyer la demande'}
+            {isSubmitting ? t('submitting') : t('submit_button')}
           </button>
         </form>
       </div>
