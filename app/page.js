@@ -369,7 +369,7 @@ export default function Home() {
             </Link>
 
             {/* Download Button */}
-            <Link href="/download" className={`${styles.navLink} ${styles.requestButton} ${styles.desktopOnly}`}>
+            <Link href="/download" className={`${styles.navLink} ${styles.desktopOnly}`}>
               {t('nav_download')}
             </Link>
             
