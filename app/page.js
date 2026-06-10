@@ -213,28 +213,32 @@ export default function Home() {
   };
 
   const [searchResults, setSearchResults] = useState(null);
+  const searchTimeout = useRef(null);
 
-  const handleSearch = async (q) => {
+  const handleSearch = (q) => {
     setSearchQuery(q);
-    if (q.trim().length > 0) {
-      // Recherche côté serveur pour contourner la limite de 1000 lignes de Supabase
+    // Annuler la recherche précédente si l'utilisateur tape vite
+    if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    if (q.trim().length === 0) {
+      setSearchResults(null);
+      return;
+    }
+    // Délai de 300ms pour ne pas spammer Supabase
+    searchTimeout.current = setTimeout(async () => {
       try {
         const { data, error } = await supabase
           .from('movies')
           .select('*')
-          .ilike('title', `%${q}%`)
+          .ilike('title', `%${q.trim()}%`)
           .order('created_at', { ascending: false })
           .limit(100);
-        
         if (!error && data) {
           setSearchResults(data);
         }
       } catch (e) {
         console.error("Erreur de recherche:", e);
       }
-    } else {
-      setSearchResults(null);
-    }
+    }, 300);
   };
 
   // Helper function to convert age rating string to number
@@ -258,6 +262,14 @@ export default function Home() {
     twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
     const movieDate = new Date(movie.created_at);
     return movieDate >= twoWeeksAgo;
+  };
+
+  // Afficher 'Autre' si la valeur de platform est un chiffre ou vide
+  const formatPlatform = (platform) => {
+    if (!platform) return null;
+    const trimmed = String(platform).trim();
+    if (!trimmed || /^\d+$/.test(trimmed)) return 'Autre';
+    return trimmed;
   };
 
   const getRandomPercentage = (movieId) => {
@@ -569,7 +581,7 @@ export default function Home() {
                   </div>
                   <div className={styles.movieInfo}>
                     <h4 className={styles.movieTitle}>{movie.title}</h4>
-                    {movie.platform && (
+                    {formatPlatform(movie.platform) && (
                       <span style={{
                         background: 'linear-gradient(135deg, #E50914, #B20710)',
                         color: 'white',
@@ -582,7 +594,7 @@ export default function Home() {
                         letterSpacing: '0.5px',
                         boxShadow: '0 2px 8px rgba(229, 9, 20, 0.3)'
                       }}>
-                        {movie.platform}
+                        {formatPlatform(movie.platform)}
                       </span>
                     )}
                   </div>
@@ -727,7 +739,7 @@ export default function Home() {
                   </div>
                   <div className={styles.movieInfo}>
                     <h4 className={styles.movieTitle}>{movie.title}</h4>
-                    {movie.platform && (
+                    {formatPlatform(movie.platform) && (
                       <span style={{
                         background: 'linear-gradient(135deg, #E50914, #B20710)',
                         color: 'white',
@@ -740,7 +752,7 @@ export default function Home() {
                         letterSpacing: '0.5px',
                         boxShadow: '0 2px 8px rgba(229, 9, 20, 0.3)'
                       }}>
-                        {movie.platform}
+                        {formatPlatform(movie.platform)}
                       </span>
                     )}
                   </div>
@@ -842,7 +854,7 @@ export default function Home() {
                   </div>
                   <div className={styles.movieInfo}>
                         <h4 className={styles.movieTitle}>{movie.title}</h4>
-                        {movie.platform && (
+                        {formatPlatform(movie.platform) && (
                           <span style={{
                             background: 'linear-gradient(135deg, #E50914, #B20710)',
                             color: 'white',
@@ -855,7 +867,7 @@ export default function Home() {
                             letterSpacing: '0.5px',
                             boxShadow: '0 2px 8px rgba(229, 9, 20, 0.3)'
                           }}>
-                            {movie.platform}
+                            {formatPlatform(movie.platform)}
                           </span>
                         )}
                       </div>
@@ -955,7 +967,7 @@ export default function Home() {
                   </div>
                   <div className={styles.movieInfo}>
                         <h4 className={styles.movieTitle}>{movie.title}</h4>
-                        {movie.platform && (
+                        {formatPlatform(movie.platform) && (
                           <span style={{
                             background: 'linear-gradient(135deg, #E50914, #B20710)',
                             color: 'white',
@@ -968,7 +980,7 @@ export default function Home() {
                             letterSpacing: '0.5px',
                             boxShadow: '0 2px 8px rgba(229, 9, 20, 0.3)'
                           }}>
-                            {movie.platform}
+                            {formatPlatform(movie.platform)}
                           </span>
                         )}
                       </div>
@@ -1014,3 +1026,6 @@ export default function Home() {
     </main>
   );
 }
+
+
+

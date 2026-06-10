@@ -8,6 +8,14 @@ export default function SearchBar({ onSearch }) {
   const searchParams = useSearchParams();
   const [query, setQuery] = useState(searchParams.get('q') || '');
 
+  const handleChange = (e) => {
+    const val = e.target.value;
+    setQuery(val);
+    if (onSearch) {
+      onSearch(val); // Recherche en temps réel pendant la frappe
+    }
+  };
+
   const handleSearch = (e) => {
     e.preventDefault();
     const trimmedQuery = query.trim();
@@ -26,7 +34,7 @@ export default function SearchBar({ onSearch }) {
         type="text" 
         placeholder="Rechercher un film..." 
         value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        onChange={handleChange}
         className="search-input"
       />
       <button type="submit" className="search-button">
