@@ -6,9 +6,16 @@ export async function updateSession(request: NextRequest) {
     request,
   })
 
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!url || !key) {
+    return supabaseResponse;
+  }
+
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    url,
+    key,
     {
       cookies: {
         getAll() {
@@ -28,7 +35,11 @@ export async function updateSession(request: NextRequest) {
   )
 
   // Rafraîchir la session automatiquement
-  await supabase.auth.getUser()
+  try {
+    await supabase.auth.getUser()
+  } catch (e) {
+    console.error("Middleware session refresh failed:", e);
+  }
 
-  return supabaseResponse
+  return supabaseResponse;
 }
