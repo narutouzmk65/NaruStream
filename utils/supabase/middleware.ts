@@ -1,28 +1,25 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+// Public keys safe to hardcode (NEXT_PUBLIC_ = client-side, sb_publishable_ = public anon key)
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://nnbtjobtewlubohtwilf.supabase.co'
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_OfYRH-g3ntbk8YloP5MTdg_pNXWzReCQ'
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   })
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!url || !key) {
-    return supabaseResponse;
-  }
-
   const supabase = createServerClient(
-    url,
-    key,
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY,
     {
       cookies: {
         getAll() {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet: { name: string; value: string; options?: CookieOptions }[]) {
-          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
           supabaseResponse = NextResponse.next({
             request,
           })
@@ -34,12 +31,7 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  // Rafraîchir la session automatiquement
-  try {
-    await supabase.auth.getUser()
-  } catch (e) {
-    console.error("Middleware session refresh failed:", e);
-  }
+  await supabase.auth.getUser()
 
-  return supabaseResponse;
+  return supabaseResponse
 }
