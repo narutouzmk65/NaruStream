@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+import Navbar from '@/components/Navbar';
 import HeroPlayer from '@/components/films/HeroPlayer';
 import FilmCard from '@/components/films/FilmCard';
 import { createClient } from '@/utils/supabase/client';
@@ -39,14 +40,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[var(--color-blue-deep)] flex flex-col">
       {/* Navbar Immersive Transparente */}
-      <nav className="absolute top-0 w-full z-50 flex items-center justify-between p-6 md:px-16 bg-gradient-to-b from-black/80 to-transparent">
-        <div className="text-2xl font-bold tracking-tighter text-white uppercase cursor-pointer hover:text-neon transition">A N T I G R A V I T Y</div>
-        <div className="flex items-center gap-6 text-sm font-semibold">
-          <button className="text-white hover:text-[#60A5FA] transition drop-shadow-md hidden md:block">FILMS</button>
-          <button className="text-white hover:text-[#60A5FA] transition drop-shadow-md hidden md:block">MA LISTE</button>
-          <div className="w-8 h-8 rounded-full bg-[#60A5FA]/20 border border-[#60A5FA]/50 cursor-pointer hover:bg-[#60A5FA]/40 transition"></div>
-        </div>
-      </nav>
+      <Navbar isAbsolute={true} />
 
       {/* Hero Section (Lecteur Vidéo Dynamique) */}
       {activeFilm ? (
